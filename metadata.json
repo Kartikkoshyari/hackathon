@@ -1,0 +1,6 @@
+{
+  "name": "ScamShield",
+  "description": "Cybersecurity Threat Analyzer, Phishing Simulator & Threat Intelligence Dashboard",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
