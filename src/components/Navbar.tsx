@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, userXp 
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-2">
           {navItems.map((item) => {
             const isActive = currentTab === item.id;
             return (
@@ -53,10 +53,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, userXp 
                 key={item.id}
                 id={`nav-${item.id}`}
                 onClick={() => handleNavClick(item.id)}
-                className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium transition-all cursor-pointer ${
+                className={`px-4 py-1.5 rounded-lg text-xs md:text-sm font-['Space_Grotesk'] font-bold transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#06b6d4] text-[#003640] font-semibold shadow-[0_0_15px_-3px_rgba(6,182,212,0.35)]'
-                    : 'text-[#bcc9cd] hover:bg-[#262a33] hover:text-[#dfe2ee]'
+                    ? 'btn-3d-cyan !py-1'
+                    : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
                 }`}
               >
                 {item.label}

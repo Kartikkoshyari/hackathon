@@ -63,3 +63,134 @@
 .glow-green {
   box-shadow: 0 0 15px -2px rgba(16, 185, 129, 0.4);
 }
+
+/* 3D Tactile Buttons & Keycaps (Hardware Cyber-Deck Aesthetic) */
+.btn-3d-cyan {
+  background: linear-gradient(180deg, #22d3ee 0%, #06b6d4 100%);
+  color: #003640;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid #0891b2;
+  box-shadow: 0 3px 0 #0e7490, 0 6px 14px rgba(6, 182, 212, 0.35);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+.btn-3d-cyan:hover {
+  background: linear-gradient(180deg, #67e8f9 0%, #22d3ee 100%);
+  box-shadow: 0 4px 0 #0e7490, 0 8px 18px rgba(6, 182, 212, 0.45);
+  transform: translateY(-1px);
+}
+.btn-3d-cyan:active {
+  box-shadow: 0 1px 0 #0e7490, 0 2px 4px rgba(6, 182, 212, 0.3);
+  transform: translateY(3px);
+}
+
+.btn-3d-dark {
+  background: linear-gradient(180deg, #1e293b 0%, #111827 100%);
+  color: #f8fafc;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid #090d16;
+  box-shadow: 0 3px 0 #070a12, 0 6px 12px rgba(0, 0, 0, 0.45);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+.btn-3d-dark:hover {
+  background: linear-gradient(180deg, #283548 0%, #172033 100%);
+  box-shadow: 0 4px 0 #070a12, 0 8px 16px rgba(0, 0, 0, 0.55);
+  transform: translateY(-1px);
+}
+.btn-3d-dark:active {
+  box-shadow: 0 1px 0 #070a12, 0 2px 4px rgba(0, 0, 0, 0.4);
+  transform: translateY(3px);
+}
+
+.btn-3d-emerald {
+  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
+  color: #022c22;
+  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  border-bottom: 1px solid #047857;
+  box-shadow: 0 3px 0 #065f46, 0 6px 14px rgba(16, 185, 129, 0.35);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+.btn-3d-emerald:hover {
+  background: linear-gradient(180deg, #6ee7b7 0%, #34d399 100%);
+  box-shadow: 0 4px 0 #065f46, 0 8px 18px rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+.btn-3d-emerald:active {
+  box-shadow: 0 1px 0 #065f46, 0 2px 4px rgba(16, 185, 129, 0.3);
+  transform: translateY(3px);
+}
+
+.btn-3d-red {
+  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
+  color: #450a0a;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 1px solid #b91c1c;
+  box-shadow: 0 3px 0 #991b1b, 0 6px 14px rgba(239, 68, 68, 0.35);
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(0);
+}
+.btn-3d-red:hover {
+  background: linear-gradient(180deg, #fca5a5 0%, #f87171 100%);
+  box-shadow: 0 4px 0 #991b1b, 0 8px 18px rgba(239, 68, 68, 0.45);
+  transform: translateY(-1px);
+}
+.btn-3d-red:active {
+  box-shadow: 0 1px 0 #991b1b, 0 2px 4px rgba(239, 68, 68, 0.3);
+  transform: translateY(3px);
+}
+
+/* Tactile 3D Keycap for presets, tags, shortcuts */
+.keycap-3d {
+  background: linear-gradient(180deg, #1e2536 0%, #101624 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid #080c14;
+  box-shadow: 0 2px 0 #05080e, 0 4px 8px rgba(0, 0, 0, 0.35);
+  transition: all 0.12s ease;
+  user-select: none;
+}
+.keycap-3d:hover {
+  border-top-color: rgba(76, 215, 246, 0.5);
+  box-shadow: 0 3px 0 #05080e, 0 6px 12px rgba(6, 182, 212, 0.25);
+  transform: translateY(-1px);
+}
+.keycap-3d:active {
+  border-bottom-width: 1px;
+  box-shadow: 0 1px 0 #05080e, 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(2px);
+}
+.keycap-3d-active {
+  background: linear-gradient(180deg, #06b6d4 0%, #0891b2 100%) !important;
+  color: #003640 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-bottom: 2px solid #0e7490 !important;
+  box-shadow: 0 2px 0 #0e7490, 0 4px 10px rgba(6, 182, 212, 0.4) !important;
+}
+
+/* 3D Hardware Bevel for Panels & HUD Cards */
+.card-3d-bevel {
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.92) 0%, rgba(11, 15, 23, 0.95) 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.input-3d-inset {
+  background: #06090e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.input-3d-inset:focus-within {
+  border-color: #22d3ee;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(6, 182, 212, 0.3);
+}
+

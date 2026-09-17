@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationTab } from '../types';
 import { analyzeMessage, PRESET_MESSAGES } from '../utils/heuristics';
+import { CyberGlobe3D } from './CyberGlobe3D';
+import { TiltCard3D } from './TiltCard3D';
 import {
   ShieldCheck,
   Zap,
@@ -9,7 +11,6 @@ import {
   ArrowRight,
   Brain,
   Sparkles,
-  Award,
   Terminal,
   ChevronRight,
   CheckCircle2,
@@ -21,6 +22,14 @@ import {
   Radio,
   Globe2,
   ShieldAlert,
+  QrCode,
+  Link2,
+  Mail,
+  MessageSquare,
+  Flame,
+  X,
+  Layers,
+  Compass,
 } from 'lucide-react';
 
 interface HomeViewProps {
@@ -88,22 +97,18 @@ const INITIAL_LIVE_THREATS: LiveThreatEvent[] = [
 export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   const [quickTestText, setQuickTestText] = useState(PRESET_MESSAGES.bank.text);
   const [quickResult, setQuickResult] = useState(() => analyzeMessage(PRESET_MESSAGES.bank.text));
-
-  // Live background activity states
   const [liveThreats, setLiveThreats] = useState<LiveThreatEvent[]>(INITIAL_LIVE_THREATS);
-  const [interceptedCount, setInterceptedCount] = useState(18942);
-  const [radarPulse, setRadarPulse] = useState(0);
+  const [interceptedCount, setInterceptedCount] = useState(19482);
+  const [activePreset, setActivePreset] = useState<'bank' | 'urgency' | 'package'>('bank');
 
-  // Interval to simulate live threat defense telemetry stream
+  // Dynamic live defense telemetry stream
   useEffect(() => {
     const interval = setInterval(() => {
       setInterceptedCount((prev) => prev + 1);
-      setRadarPulse((p) => (p + 1) % 4);
 
-      // Cycle in new threat samples
       const newThreatPool: LiveThreatEvent[] = [
         {
-          id: `t-${Date.now()}`,
+          id: `t-${Date.now()}-1`,
           type: 'LINK',
           target: 'paypal-auth-resolution.cc/secure',
           category: 'Banking Spoof Vector',
@@ -116,7 +121,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
           type: 'EMAIL',
           target: 'ceo-desk@board-urgent-wire.net',
           category: 'Executive Impersonation (BEC)',
-          origin: 'Toronto / Hetzner',
+          origin: 'Frankfurt / Hetzner',
           timeAgo: 'Just now',
           risk: 99,
         },
@@ -138,160 +143,201 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
           timeAgo: 'Just now',
           risk: 92,
         },
+        {
+          id: `t-${Date.now()}-5`,
+          type: 'LINK',
+          target: 'https://microsoft-onedrive-share.online/doc',
+          category: 'Credential Stealing Phish',
+          origin: 'Ashburn / Azure',
+          timeAgo: 'Just now',
+          risk: 95,
+        },
       ];
 
       const chosen = newThreatPool[Math.floor(Math.random() * newThreatPool.length)];
       setLiveThreats((current) => [chosen, ...current.slice(0, 4)]);
-    }, 4500);
+    }, 4000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const handleQuickAnalyze = (text: string) => {
+  const handleQuickAnalyze = (text: string, presetKey?: 'bank' | 'urgency' | 'package') => {
     setQuickTestText(text);
     setQuickResult(analyzeMessage(text));
+    if (presetKey) setActivePreset(presetKey);
+  };
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setQuickTestText(val);
+    setQuickResult(analyzeMessage(val));
   };
 
   return (
-    <div className="w-full flex flex-col gap-10 py-4">
-      {/* Hero Section with Live Background Cyber Activity */}
-      <section className="relative overflow-hidden rounded-2xl bg-[#0d131f] border border-white/10 p-6 md:p-10 shadow-2xl">
-        {/* Animated Cyber Grid Canvas Background */}
-        <div 
-          className="absolute inset-0 opacity-15 pointer-events-none"
+    <div className="w-full flex flex-col gap-10 py-2">
+      {/* HERO SECTION: 3D CYBER SPHERICAL COMMAND DECK (v1.png Inspiration) */}
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#0a0f19] via-[#080d16] to-[#06090e] border border-cyan-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+        {/* Subtle Cyber Grid Matrix */}
+        <div
+          className="absolute inset-0 opacity-10 pointer-events-none"
           style={{
             backgroundImage: `radial-gradient(circle at 50% 50%, #06b6d4 1px, transparent 1px), linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)`,
-            backgroundSize: '40px 40px, 40px 40px, 40px 40px',
+            backgroundSize: '44px 44px, 44px 44px, 44px 44px',
           }}
         />
 
-        {/* Ambient Glowing Orbs */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#06b6d4]/15 blur-3xl pointer-events-none animate-pulse" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-[#10B981]/12 blur-3xl pointer-events-none" />
+        {/* Ambient Glows */}
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[140px] pointer-events-none" />
 
-        {/* Floating Cyber Radar Sweep Visualizer */}
-        <div className="absolute top-6 right-6 w-48 h-48 md:w-64 md:h-64 rounded-full border border-cyan-500/20 pointer-events-none hidden md:flex items-center justify-center">
-          <div className="w-36 h-36 rounded-full border border-cyan-500/25 flex items-center justify-center">
-            <div className="w-20 h-20 rounded-full border border-cyan-500/30 flex items-center justify-center">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-8 md:p-12 items-center">
+          {/* Left Hero Column: Tactical Mission & 3D Key Triggers (7 cols) */}
+          <div className="lg:col-span-7 flex flex-col gap-6">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="keycap-3d inline-flex items-center gap-2 px-3 py-1 rounded-md text-[#4cd7f6] font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-[#4cd7f6] animate-ping" />
+                <span>DEFENSE ENGINE v4.8 ACTIVE</span>
+              </div>
+              <div className="keycap-3d inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[#10B981] font-['JetBrains_Mono'] text-xs font-semibold">
+                <Activity className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '4s' }} />
+                <span>0.4ms LOCAL PARSING</span>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h1 className="font-['Space_Grotesk'] text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#F8FAFC] leading-[1.08]">
+                Real-Time Threat <span className="text-[#22d3ee] drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">Deconstruction</span> &amp; Attack Defense
+              </h1>
+              <p className="text-base sm:text-lg text-[#94A3B8] leading-relaxed max-w-2xl font-['Inter']">
+                ScamShield exposes malicious intent behind spoofed banking notifications, fraudulent QR quishing traps, and deceptive links. Inspect payloads with deterministic sub-millisecond scoring.
+              </p>
+            </div>
+
+            {/* Tactical 3D Action Keypad */}
+            <div className="flex flex-wrap items-center gap-3.5 pt-2">
+              <button
+                onClick={() => onNavigate('analyzer')}
+                className="btn-3d-cyan px-6 py-3.5 rounded-xl font-['Space_Grotesk'] text-sm md:text-base font-bold flex items-center gap-2.5 cursor-pointer"
+                id="heroLaunchAnalyzer"
+              >
+                <Zap className="w-5 h-5 fill-current" />
+                Launch Threat Verifier
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => onNavigate('simulator')}
+                className="btn-3d-dark px-6 py-3.5 rounded-xl font-['Space_Grotesk'] text-sm md:text-base font-bold flex items-center gap-2.5 cursor-pointer"
+                id="heroLaunchSimulator"
+              >
+                <PlayCircle className="w-5 h-5 text-[#4edea3]" />
+                Phishing Simulator
+              </button>
+
+              <button
+                onClick={() => onNavigate('dashboard')}
+                className="keycap-3d px-5 py-3.5 rounded-xl text-slate-300 hover:text-white font-['JetBrains_Mono'] text-xs md:text-sm font-semibold flex items-center gap-2 cursor-pointer"
+                id="heroLaunchDashboard"
+              >
+                <BarChart3 className="w-4 h-4 text-[#ffb95f]" />
+                Threat Intel
+              </button>
+            </div>
+
+            {/* Quick Stat Indicators */}
+            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/10">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">Neutralized Today</span>
+                <span className="font-['Space_Grotesk'] text-lg sm:text-2xl font-bold text-cyan-400">
+                  {interceptedCount.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">Detection Speed</span>
+                <span className="font-['Space_Grotesk'] text-lg sm:text-2xl font-bold text-emerald-400">
+                  &lt; 0.4 ms
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">Privacy Sandbox</span>
+                <span className="font-['Space_Grotesk'] text-lg sm:text-2xl font-bold text-slate-100">
+                  100% In-Browser
+                </span>
+              </div>
             </div>
           </div>
-          {/* Radar sweeping scan line */}
-          <div 
-            className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-500/20 via-transparent to-transparent animate-spin"
-            style={{ animationDuration: '6s' }}
-          />
-          {/* Radar Blip Dots */}
-          <div className="absolute top-12 left-14 w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] animate-ping" />
-          <div className="absolute bottom-16 right-16 w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#f59e0b] animate-pulse" />
-          <div className="absolute top-20 right-10 text-[9px] font-mono text-cyan-400/70">
-            DEFENSE SCAN ACTIVE
+
+          {/* Right Hero Column: Interactive 3D Cyber Particle Globe (5 cols - v1.png Style) */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
+            <div className="w-full max-w-[460px] aspect-square rounded-2xl bg-[#080d17]/80 border border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)] p-2 relative overflow-hidden flex items-center justify-center">
+              <CyberGlobe3D height={420} className="w-full h-full rounded-xl" interactive={true} />
+
+              {/* Tactical Globe Telemetry Floating Legend */}
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between p-2 rounded-lg bg-[#06090e]/85 backdrop-blur-md border border-white/10 text-[11px] font-mono">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  <span className="text-slate-200">LIVE TARGET INTERCEPT</span>
+                </div>
+                <span className="text-cyan-400">SPIN TO INSPECT</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="relative z-10 max-w-3xl space-y-6">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1E293B]/90 text-[#4cd7f6] border border-[#06b6d4]/40 font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-[#4cd7f6] animate-pulse" />
-              THREAT DEFENSE PLATFORM ACTIVE
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 font-['JetBrains_Mono'] text-xs font-semibold">
-              <Activity className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '4s' }} />
-              LIVE TELEMETRY STREAM
-            </span>
-          </div>
-
-          <h1 className="font-['Space_Grotesk'] text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#F8FAFC] leading-[1.1]">
-            Instant Threat Deconstruction &amp; Attack <span className="text-[#4cd7f6]">Neutralization</span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-[#94A3B8] leading-relaxed">
-            ScamShield deconstructs deceptive links, QR quishing codes, malicious emails, and spoofed messages.
-            Deep multi-modal threat analysis reveals exactly why dangerous payloads should be avoided.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <button
-              onClick={() => onNavigate('analyzer')}
-              className="px-6 py-3.5 rounded-xl bg-[#06b6d4] hover:bg-[#4cd7f6] text-[#003640] font-['Space_Grotesk'] text-sm md:text-base font-bold flex items-center gap-2 shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] transition-all cursor-pointer"
-            >
-              <Zap className="w-5 h-5 fill-current" />
-              Launch Threat Analyzer
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => onNavigate('simulator')}
-              className="px-6 py-3.5 rounded-xl bg-[#1E293B] hover:bg-[#262a33] text-[#F8FAFC] font-['Space_Grotesk'] text-sm md:text-base font-bold flex items-center gap-2 border border-white/10 transition-all cursor-pointer"
-            >
-              <PlayCircle className="w-5 h-5 text-[#4edea3]" />
-              Interactive Attack Simulator
-            </button>
-
-            <button
-              onClick={() => onNavigate('dashboard')}
-              className="px-5 py-3.5 rounded-xl bg-[#181c24] hover:bg-[#1E293B] text-[#94A3B8] hover:text-[#F8FAFC] font-['JetBrains_Mono'] text-xs md:text-sm font-semibold flex items-center gap-1.5 transition-all border border-white/5 cursor-pointer"
-            >
-              <BarChart3 className="w-4 h-4 text-[#ffb95f]" />
-              Threat Intel Dashboard
-            </button>
-          </div>
-        </div>
-
-        {/* Live Cyber Threat Feed Bar (Real-Time Background Activity Widget) */}
-        <div className="mt-8 pt-6 border-t border-white/10 relative z-10">
+        {/* Live Cyber Threat Feed Bar */}
+        <div className="border-t border-white/10 p-4 md:px-8 bg-[#070b13] relative z-10">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
               <span className="font-['JetBrains_Mono'] text-xs font-bold text-[#F8FAFC] uppercase tracking-wider flex items-center gap-1.5">
                 <Radio className="w-3.5 h-3.5 text-cyan-400" />
-                Live Global Threat Interceptions
+                Global Threat Interception Feed
               </span>
               <span className="text-xs font-mono text-[#64748B]">|</span>
               <span className="text-xs font-mono text-[#10B981]">
-                {interceptedCount.toLocaleString()} Attacks Neutralized Today
+                Continuous Stream
               </span>
             </div>
 
             <div className="flex items-center gap-3 text-[11px] font-mono text-[#94A3B8]">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-cyan-400" />
-                Response: 0.4ms
+                Telemetry: Online
               </span>
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                Engine: Active
+                Zero-Leak Mode: Active
               </span>
             </div>
           </div>
 
-          {/* Scrolling / Animated Live Threat Feed Cards */}
+          {/* Real-time Threat Ticker Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
             {liveThreats.slice(0, 3).map((threat, idx) => (
               <div
                 key={threat.id}
                 className={`p-2.5 rounded-lg border transition-all flex items-center justify-between gap-2 ${
                   idx === 0
-                    ? 'bg-red-950/30 border-red-500/40 animate-pulse'
-                    : 'bg-[#111827]/80 border-white/5'
+                    ? 'bg-red-950/30 border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.2)] animate-pulse'
+                    : 'bg-[#0f1624] border-white/10'
                 }`}
               >
                 <div className="flex items-center gap-2 overflow-hidden">
                   <span
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ${
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ${
                       threat.type === 'LINK'
-                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                         : threat.type === 'EMAIL'
                         ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                         : threat.type === 'QR'
-                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                        : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                     }`}
                   >
                     {threat.type}
                   </span>
                   <div className="flex flex-col truncate">
-                    <span className="text-xs font-mono text-slate-200 truncate" title={threat.target}>
+                    <span className="text-xs font-mono text-slate-100 truncate" title={threat.target}>
                       {threat.target}
                     </span>
                     <span className="text-[10px] text-slate-400 truncate">
@@ -300,7 +346,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
                   </div>
                 </div>
 
-                <span className="text-[10px] font-mono font-bold text-red-400 shrink-0 px-1.5 py-0.5 rounded bg-red-500/10">
+                <span className="text-[10px] font-mono font-bold text-red-400 shrink-0 px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20">
                   {threat.risk}% RISK
                 </span>
               </div>
@@ -309,207 +355,260 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* Interactive Quick Scanner Preview Widget */}
-      <section className="bg-[#111827] rounded-xl p-6 md:p-8 border border-white/8 shadow-xl space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-white/8 pb-4">
+      {/* INTERACTIVE LIVE HEURISTIC TESTBENCH (With Click-to-Select-All Feature) */}
+      <section className="relative rounded-2xl bg-[#0b111e] p-6 md:p-8 border border-white/10 shadow-2xl space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div>
             <h2 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC] flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-[#4cd7f6]" />
+              <Terminal className="w-5 h-5 text-[#22d3ee]" />
               Live Heuristic Evaluation Testbench
             </h2>
             <p className="text-xs text-[#94A3B8]">
-              Try sample payloads below to verify our 0.4ms rule-based scoring engine
+              Click any text below to <strong className="text-cyan-400">auto-select all</strong> and replace or remove instantly.
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-['JetBrains_Mono'] text-[#10B981] bg-[#10B981]/10 px-2.5 py-1 rounded border border-[#10B981]/30">
-              Evaluated in {quickResult.latencyMs}ms
+            <span className="text-xs font-['JetBrains_Mono'] text-[#10B981] bg-[#10B981]/10 px-3 py-1 rounded border border-[#10B981]/30">
+              Deterministic Parsing: {quickResult.latencyMs}ms
             </span>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+
+        {/* 3D Tactile Preset Keys */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <span className="text-xs font-mono text-slate-400 mr-1">Load Preset Payload:</span>
           <button
-            onClick={() => handleQuickAnalyze(PRESET_MESSAGES.bank.text)}
-            className="px-3 py-1.5 rounded bg-[#1E293B] hover:bg-[#262a33] text-xs font-['JetBrains_Mono'] text-[#4cd7f6] border border-white/10 cursor-pointer"
+            onClick={() => handleQuickAnalyze(PRESET_MESSAGES.bank.text, 'bank')}
+            className={`keycap-3d px-3.5 py-1.5 rounded-lg text-xs font-['JetBrains_Mono'] font-bold cursor-pointer transition-all ${
+              activePreset === 'bank' ? 'keycap-3d-active' : 'text-slate-300'
+            }`}
           >
-            Bank Alert SMS
+            Bank Fraud SMS
           </button>
           <button
-            onClick={() => handleQuickAnalyze(PRESET_MESSAGES.urgency.text)}
-            className="px-3 py-1.5 rounded bg-[#1E293B] hover:bg-[#262a33] text-xs font-['JetBrains_Mono'] text-[#F8FAFC] border border-white/10 cursor-pointer"
+            onClick={() => handleQuickAnalyze(PRESET_MESSAGES.urgency.text, 'urgency')}
+            className={`keycap-3d px-3.5 py-1.5 rounded-lg text-xs font-['JetBrains_Mono'] font-bold cursor-pointer transition-all ${
+              activePreset === 'urgency' ? 'keycap-3d-active' : 'text-slate-300'
+            }`}
           >
-            Urgency Invoice Email
+            Urgent Invoice BEC
           </button>
           <button
-            onClick={() => handleQuickAnalyze(PRESET_MESSAGES.package.text)}
-            className="px-3 py-1.5 rounded bg-[#1E293B] hover:bg-[#262a33] text-xs font-['JetBrains_Mono'] text-[#F8FAFC] border border-white/10 cursor-pointer"
+            onClick={() => handleQuickAnalyze(PRESET_MESSAGES.package.text, 'package')}
+            className={`keycap-3d px-3.5 py-1.5 rounded-lg text-xs font-['JetBrains_Mono'] font-bold cursor-pointer transition-all ${
+              activePreset === 'package' ? 'keycap-3d-active' : 'text-slate-300'
+            }`}
           >
-            USPS Customs Fee Smishing
+            USPS Smishing Vector
           </button>
+
+          {quickTestText && (
+            <button
+              onClick={() => {
+                setQuickTestText('');
+                setQuickResult(analyzeMessage(''));
+              }}
+              className="ml-auto text-xs font-mono text-slate-400 hover:text-red-400 flex items-center gap-1 cursor-pointer transition-colors"
+              title="Clear all text"
+            >
+              <X className="w-3.5 h-3.5" />
+              Clear text
+            </button>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-[#06090E] p-4 rounded-xl border border-white/10">
-          <div className="md:col-span-8 font-['JetBrains_Mono'] text-xs text-[#dfe2ee] leading-relaxed">
-            {quickTestText}
+        {/* Split Input & Live Score Gauge */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch bg-[#06090E] p-4 rounded-xl border border-white/10 input-3d-inset">
+          <div className="md:col-span-8 flex flex-col justify-center relative">
+            <textarea
+              value={quickTestText}
+              onChange={handleTextChange}
+              onClick={(e) => e.currentTarget.select()}
+              onFocus={(e) => e.currentTarget.select()}
+              rows={3}
+              placeholder="Click here to type or paste any suspicious text or link (auto-selects all on click)..."
+              className="w-full bg-transparent text-xs font-['JetBrains_Mono'] text-[#dfe2ee] placeholder:text-slate-600 focus:outline-none resize-none leading-relaxed"
+            />
+            <span className="text-[10px] font-mono text-slate-500 mt-1">
+              Tip: Click text to select all for fast deletion or replacement
+            </span>
           </div>
 
-          <div className="md:col-span-4 flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-4">
+          <div className="md:col-span-4 flex items-center justify-between md:justify-end gap-5 border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5">
             <div className="flex flex-col">
-              <span className="text-[10px] font-['JetBrains_Mono'] text-[#64748B] uppercase">Deception Score</span>
+              <span className="text-[10px] font-['JetBrains_Mono'] text-slate-400 uppercase tracking-wider">
+                Deception Score
+              </span>
+              <div className="flex items-baseline gap-1.5">
+                <span
+                  className={`font-['Space_Grotesk'] text-3xl font-extrabold ${
+                    quickResult.score >= 80
+                      ? 'text-[#EF4444] drop-shadow-[0_0_12px_rgba(239,68,68,0.4)]'
+                      : quickResult.score >= 50
+                      ? 'text-[#F59E0B]'
+                      : 'text-[#10B981]'
+                  }`}
+                >
+                  {quickResult.score}
+                </span>
+                <span className="text-xs font-mono text-slate-500">/100</span>
+              </div>
               <span
-                className={`font-['Space_Grotesk'] text-2xl font-bold ${
-                  quickResult.score >= 80 ? 'text-[#EF4444]' : 'text-[#F59E0B]'
+                className={`text-[11px] font-mono font-bold ${
+                  quickResult.riskLevel === 'critical'
+                    ? 'text-red-400'
+                    : quickResult.riskLevel === 'warning'
+                    ? 'text-amber-400'
+                    : 'text-emerald-400'
                 }`}
               >
-                {quickResult.score}/100
+                {quickResult.riskLevel === 'critical'
+                  ? 'CRITICAL THREAT'
+                  : quickResult.riskLevel === 'warning'
+                  ? 'SUSPICIOUS'
+                  : 'BENIGN / SAFE'}
               </span>
             </div>
 
             <button
               onClick={() => onNavigate('analyzer')}
-              className="px-3.5 py-2 rounded-lg bg-[#06b6d4] text-[#003640] font-['Space_Grotesk'] text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-[#4cd7f6]"
+              className="btn-3d-cyan px-4 py-2.5 rounded-lg font-['Space_Grotesk'] text-xs font-bold flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
-              Full Breakdown
-              <ChevronRight className="w-3.5 h-3.5" />
+              Inspect in Engine
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </section>
 
-      {/* 3 Core Architecture Pillars */}
+      {/* 3 CORE CAPABILITY PILLARS WITH 3D PERSPECTIVE TILT */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Pillar 1: Analyzer */}
-        <div
+        {/* Pillar 1: Threat Analyzer */}
+        <TiltCard3D
           onClick={() => onNavigate('analyzer')}
-          className="group p-6 rounded-2xl bg-[#111827] border border-white/8 hover:border-[#06b6d4]/50 shadow-xl transition-all cursor-pointer flex flex-col justify-between"
+          className="group p-6 rounded-2xl bg-[#0e1523] border border-white/10 hover:border-cyan-500/50 shadow-xl transition-all cursor-pointer flex flex-col justify-between"
         >
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-[#06b6d4]/15 text-[#4cd7f6] flex items-center justify-center font-bold">
+          <div className="space-y-3.5">
+            <div className="w-12 h-12 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center font-bold border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.25)]">
               <Zap className="w-6 h-6" />
             </div>
-            <h3 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC] group-hover:text-[#4cd7f6] transition-colors">
-              Message Threat Analyzer
+            <h3 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC] group-hover:text-cyan-400 transition-colors">
+              Threat &amp; Quishing Analyzer
             </h3>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Real-time cognitive pattern evaluation. Detects false urgency, bogus legal threats, lookalike phishing
-              domains, and micro-charge traps with interactive word-level annotation.
+              Multi-vector deconstruction for suspicious links, QR code image uploads (quishing), and raw email headers. Detects lookalike domains, fake urgency, and credential traps.
             </p>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-xs font-['JetBrains_Mono'] text-[#4cd7f6]">
-            <span>Open Analyzer Console</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <div className="pt-4 mt-6 border-t border-white/10 flex items-center justify-between text-xs font-['JetBrains_Mono'] text-cyan-400">
+            <span className="font-bold">Open Verification Engine</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
           </div>
-        </div>
+        </TiltCard3D>
 
-        {/* Pillar 2: Simulator */}
-        <div
+        {/* Pillar 2: Phishing Simulator */}
+        <TiltCard3D
           onClick={() => onNavigate('simulator')}
-          className="group p-6 rounded-2xl bg-[#111827] border border-white/8 hover:border-[#4edea3]/50 shadow-xl transition-all cursor-pointer flex flex-col justify-between"
+          className="group p-6 rounded-2xl bg-[#0e1523] border border-white/10 hover:border-emerald-500/50 shadow-xl transition-all cursor-pointer flex flex-col justify-between"
         >
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-[#4edea3]/15 text-[#4edea3] flex items-center justify-center font-bold">
+          <div className="space-y-3.5">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
               <PlayCircle className="w-6 h-6" />
             </div>
-            <h3 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC] group-hover:text-[#4edea3] transition-colors">
-              Phishing Simulator
+            <h3 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC] group-hover:text-emerald-400 transition-colors">
+              Attack Detection Simulator
             </h3>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Gamified red-flag training arena. Inspect authentic smishing and spear-phishing templates, tag deceptive
-              tokens, test false positive intuition, and earn defense XP.
+              Gamified red-flag training arena. Inspect authentic smishing and spear-phishing templates, tag deceptive tokens, sharpen human intuition, and earn defense XP.
             </p>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-xs font-['JetBrains_Mono'] text-[#4edea3]">
-            <span>Start Practice Challenge</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <div className="pt-4 mt-6 border-t border-white/10 flex items-center justify-between text-xs font-['JetBrains_Mono'] text-emerald-400">
+            <span className="font-bold">Enter Practice Arena</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
           </div>
-        </div>
+        </TiltCard3D>
 
-        {/* Pillar 3: Dashboard */}
-        <div
+        {/* Pillar 3: Threat Intelligence Dashboard */}
+        <TiltCard3D
           onClick={() => onNavigate('dashboard')}
-          className="group p-6 rounded-2xl bg-[#111827] border border-white/8 hover:border-[#ffb95f]/50 shadow-xl transition-all cursor-pointer flex flex-col justify-between"
+          className="group p-6 rounded-2xl bg-[#0e1523] border border-white/10 hover:border-amber-500/50 shadow-xl transition-all cursor-pointer flex flex-col justify-between"
         >
-          <div className="space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-[#ffb95f]/15 text-[#ffb95f] flex items-center justify-center font-bold">
+          <div className="space-y-3.5">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center font-bold border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]">
               <BarChart3 className="w-6 h-6" />
             </div>
-            <h3 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC] group-hover:text-[#ffb95f] transition-colors">
-              Threat Intelligence Dashboard
+            <h3 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC] group-hover:text-amber-400 transition-colors">
+              Threat Intelligence Hub
             </h3>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Interactive telemetry reporting. Track your tactic breakdown tiers, detailed
-              heuristic trigger weights, and export structured JSON intelligence reports.
+              Comprehensive telemetry reporting. Track cognitive tactic distributions, examine heuristic trigger weights, review session logs, and export structured threat reports.
             </p>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-xs font-['JetBrains_Mono'] text-[#ffb95f]">
-            <span>View Intelligence Hub</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <div className="pt-4 mt-6 border-t border-white/10 flex items-center justify-between text-xs font-['JetBrains_Mono'] text-amber-400">
+            <span className="font-bold">Access Intel Dashboard</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
           </div>
-        </div>
+        </TiltCard3D>
       </section>
 
-      {/* Intelligence & AI Architecture Bento */}
-      <section className="bg-[#181c24]/90 rounded-2xl p-6 md:p-8 border border-white/8 space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-white/8 pb-4">
+      {/* DEFENSE SPECIFICATIONS & ARCHITECTURE BENTO */}
+      <section className="bg-[#0b111e] rounded-2xl p-6 md:p-8 border border-white/10 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-white/10 pb-4">
           <div>
-            <span className="text-xs font-['JetBrains_Mono'] text-[#ffb95f] uppercase tracking-wider font-semibold">
-              HYBRID DEFENSE ARCHITECTURE
+            <span className="text-xs font-['JetBrains_Mono'] text-cyan-400 uppercase tracking-wider font-semibold">
+              SECURITY ARCHITECTURE
             </span>
             <h2 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC]">
-              Local Sub-Millisecond Heuristics + Multi-Modal Threat Verification
+              Deterministic Rules Engine + Explainable Threat Attribution
             </h2>
           </div>
-          <span className="px-3 py-1 rounded bg-[#06090E] text-[#10B981] font-['JetBrains_Mono'] text-xs border border-[#10B981]/30">
-            THREAT ENGINE ACTIVE
+          <span className="px-3 py-1 rounded bg-[#06090E] text-[#10B981] font-['JetBrains_Mono'] text-xs border border-[#10B981]/30 font-semibold flex items-center gap-1.5">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            100% OPERATIONAL
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-xl bg-[#06090E] border border-white/5 space-y-2">
+          <div className="p-4 rounded-xl bg-[#06090E] border border-white/5 space-y-2 hover:border-cyan-500/30 transition-colors">
             <div className="text-[#10B981] font-['JetBrains_Mono'] text-xs font-bold flex items-center gap-1.5">
               <Lock className="w-4 h-4" />
               100% Privacy Sandbox
             </div>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Private emails and banking notifications are never piped over network sockets to external cloud APIs or
-              third-party AI providers.
+              Private emails and banking notifications are processed client-side. Zero telemetry or sensitive credentials are ever sent to remote trackers.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#06090E] border border-white/5 space-y-2">
+          <div className="p-4 rounded-xl bg-[#06090E] border border-white/5 space-y-2 hover:border-cyan-500/30 transition-colors">
             <div className="text-[#4cd7f6] font-['JetBrains_Mono'] text-xs font-bold flex items-center gap-1.5">
               <Zap className="w-4 h-4" />
-              0.4ms Sub-millisecond Execution
+              0.4ms Local Execution
             </div>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              While remote LLMs require 3 to 6 seconds for inference, ScamShield’s deterministic parsing compiles in
-              under 1 millisecond.
+              Deterministic syntactic parsing compiles in sub-millisecond speeds. No latency delays or cloud round-trips for standard inspection.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#06090E] border border-white/5 space-y-2">
+          <div className="p-4 rounded-xl bg-[#06090E] border border-white/5 space-y-2 hover:border-cyan-500/30 transition-colors">
             <div className="text-[#ffb95f] font-['JetBrains_Mono'] text-xs font-bold flex items-center gap-1.5">
-              <Cpu className="w-4 h-4" />
-              Offline Capable &amp; Lightweight
+              <QrCode className="w-4 h-4" />
+              Quishing Image Deconstruct
             </div>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Works completely without an active internet connection after initial bundle load. Ideal for mobile smishing
-              interceptors.
+              Direct parsing of deceptive QR codes embedded on parking meters, utility bills, and phishing emails before your camera opens them.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#06090E] border border-white/5 space-y-2">
+          <div className="p-4 rounded-xl bg-[#06090E] border border-white/5 space-y-2 hover:border-cyan-500/30 transition-colors">
             <div className="text-[#4edea3] font-['JetBrains_Mono'] text-xs font-bold flex items-center gap-1.5">
               <Brain className="w-4 h-4" />
               Explainable AI (XAI)
             </div>
             <p className="text-xs text-[#94A3B8] leading-relaxed">
-              Every score is mathematically deconstructed into weighted trigger points, eliminating opaque hallucinations
-              common in generative models.
+              Every verdict gives you clear, decisive reasons and specific red flags so you always know why a payload is dangerous and how to act safely.
             </p>
           </div>
         </div>

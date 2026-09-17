@@ -128,10 +128,10 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ onNavigate, onAwar
             <button
               key={scen.id}
               onClick={() => handleSelectScenario(idx)}
-              className={`px-3.5 py-2 rounded-lg text-xs font-['JetBrains_Mono'] transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+              className={`keycap-3d px-3.5 py-2 rounded-lg text-xs font-['JetBrains_Mono'] transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
                 isSelected
-                  ? 'bg-[#1E293B] border-[#4edea3] text-[#4edea3] shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-                  : 'bg-[#111827] border-white/10 text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
+                  ? 'keycap-3d-active text-[#003640]'
+                  : 'text-[#94A3B8] hover:text-white'
               }`}
             >
               {scen.channel === 'SMS' ? (
@@ -281,10 +281,10 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ onNavigate, onAwar
                 <button
                   disabled={hasSubmitted}
                   onClick={() => handleMakeVerdict('phishing')}
-                  className={`flex-1 w-full py-3 px-4 rounded-lg font-['Space_Grotesk'] text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  className={`flex-1 w-full py-3.5 px-4 rounded-xl font-['Space_Grotesk'] text-sm font-bold flex items-center justify-center gap-2 cursor-pointer ${
                     hasSubmitted && userVerdict === 'phishing'
-                      ? 'bg-[#EF4444] text-white shadow-[0_0_20px_rgba(239,68,68,0.5)]'
-                      : 'bg-[#EF4444]/20 hover:bg-[#EF4444] text-[#EF4444] hover:text-white border border-[#EF4444]/40 hover:shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                      ? 'btn-3d-red ring-2 ring-red-400'
+                      : 'btn-3d-red'
                   } ${hasSubmitted ? 'opacity-90' : ''}`}
                 >
                   <ShieldAlert className="w-4 h-4" />
@@ -294,10 +294,10 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ onNavigate, onAwar
                 <button
                   disabled={hasSubmitted}
                   onClick={() => handleMakeVerdict('legitimate')}
-                  className={`flex-1 w-full py-3 px-4 rounded-lg font-['Space_Grotesk'] text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  className={`flex-1 w-full py-3.5 px-4 rounded-xl font-['Space_Grotesk'] text-sm font-bold flex items-center justify-center gap-2 cursor-pointer ${
                     hasSubmitted && userVerdict === 'legitimate'
-                      ? 'bg-[#10B981] text-white shadow-[0_0_20px_rgba(16,185,129,0.5)]'
-                      : 'bg-[#10B981]/20 hover:bg-[#10B981] text-[#10B981] hover:text-white border border-[#10B981]/40 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                      ? 'btn-3d-emerald ring-2 ring-emerald-400'
+                      : 'btn-3d-emerald'
                   } ${hasSubmitted ? 'opacity-90' : ''}`}
                 >
                   <ShieldCheck className="w-4 h-4" />

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { analyzeMessage, PRESET_MESSAGES } from '../utils/heuristics';
 import { AnalysisResult, NavigationTab, UploadMode, AIVerificationResult } from '../types';
+import { TiltCard3D } from './TiltCard3D';
 import {
   Terminal,
   Trash2,
@@ -20,6 +21,7 @@ import {
   Upload,
   CheckCircle2,
   XCircle,
+  X,
   Sparkles,
   AlertOctagon,
   ExternalLink,
@@ -541,17 +543,17 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
       </section>
 
       {/* Main 3 Sections Ingestion Navigation */}
-      <div className="flex items-center gap-2 p-1.5 bg-[#111827] rounded-xl border border-white/8 overflow-x-auto">
+      <div className="flex items-center gap-2 p-2 bg-[#111827] rounded-xl border border-white/8 overflow-x-auto">
         {/* Tab 1: Link & QR Code */}
         <button
           onClick={() => {
             setActiveMode('link_qr');
             setVerificationError(null);
           }}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs md:text-sm font-['Space_Grotesk'] font-bold transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs md:text-sm font-['Space_Grotesk'] font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeMode === 'link_qr'
-              ? 'bg-[#06b6d4] text-[#003640] shadow-[0_0_15px_rgba(6,182,212,0.35)]'
-              : 'text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#F8FAFC]'
+              ? 'btn-3d-cyan'
+              : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
           }`}
           id="tabLinkQR"
         >
@@ -568,10 +570,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
             setActiveMode('email');
             setVerificationError(null);
           }}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs md:text-sm font-['Space_Grotesk'] font-bold transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs md:text-sm font-['Space_Grotesk'] font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeMode === 'email'
-              ? 'bg-[#06b6d4] text-[#003640] shadow-[0_0_15px_rgba(6,182,212,0.35)]'
-              : 'text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#F8FAFC]'
+              ? 'btn-3d-cyan'
+              : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
           }`}
           id="tabEmail"
         >
@@ -585,10 +587,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
             setActiveMode('text');
             setVerificationError(null);
           }}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs md:text-sm font-['Space_Grotesk'] font-bold transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs md:text-sm font-['Space_Grotesk'] font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeMode === 'text'
-              ? 'bg-[#06b6d4] text-[#003640] shadow-[0_0_15px_rgba(6,182,212,0.35)]'
-              : 'text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#F8FAFC]'
+              ? 'btn-3d-cyan'
+              : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
           }`}
           id="tabMessage"
         >
@@ -610,20 +612,20 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                   <>
                     <button
                       onClick={() => setLinkQrSubMode('link')}
-                      className={`px-3 py-1.5 rounded text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer ${
                         linkQrSubMode === 'link'
-                          ? 'bg-[#06b6d4] text-[#003640]'
-                          : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                          ? 'btn-3d-cyan !py-1'
+                          : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
                       }`}
                     >
                       Paste Link / URL
                     </button>
                     <button
                       onClick={() => setLinkQrSubMode('qr')}
-                      className={`px-3 py-1.5 rounded text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer flex items-center gap-1 ${
                         linkQrSubMode === 'qr'
-                          ? 'bg-[#06b6d4] text-[#003640]'
-                          : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                          ? 'btn-3d-cyan !py-1'
+                          : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
                       }`}
                     >
                       <QrCode className="w-3.5 h-3.5" />
@@ -636,20 +638,20 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                   <>
                     <button
                       onClick={() => setEmailSubMode('paste')}
-                      className={`px-3 py-1.5 rounded text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer ${
                         emailSubMode === 'paste'
-                          ? 'bg-[#06b6d4] text-[#003640]'
-                          : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                          ? 'btn-3d-cyan !py-1'
+                          : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
                       }`}
                     >
                       Paste Email / Link
                     </button>
                     <button
                       onClick={() => setEmailSubMode('upload')}
-                      className={`px-3 py-1.5 rounded text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer flex items-center gap-1 ${
                         emailSubMode === 'upload'
-                          ? 'bg-[#06b6d4] text-[#003640]'
-                          : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                          ? 'btn-3d-cyan !py-1'
+                          : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
                       }`}
                     >
                       <Upload className="w-3.5 h-3.5" />
@@ -662,20 +664,20 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                   <>
                     <button
                       onClick={() => setTextSubMode('write')}
-                      className={`px-3 py-1.5 rounded text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer ${
                         textSubMode === 'write'
-                          ? 'bg-[#06b6d4] text-[#003640]'
-                          : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                          ? 'btn-3d-cyan !py-1'
+                          : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
                       }`}
                     >
                       Write / Paste Text
                     </button>
                     <button
                       onClick={() => setTextSubMode('upload')}
-                      className={`px-3 py-1.5 rounded text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-['Space_Grotesk'] font-bold transition-all cursor-pointer flex items-center gap-1 ${
                         textSubMode === 'upload'
-                          ? 'bg-[#06b6d4] text-[#003640]'
-                          : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                          ? 'btn-3d-cyan !py-1'
+                          : 'keycap-3d text-[#94A3B8] hover:text-[#F8FAFC]'
                       }`}
                     >
                       <Upload className="w-3.5 h-3.5" />
@@ -688,10 +690,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
               {/* Clear button */}
               <button
                 onClick={handleClear}
-                className="font-['JetBrains_Mono'] text-[11px] text-[#64748B] hover:text-[#EF4444] transition-colors flex items-center gap-1 cursor-pointer"
+                className="font-['JetBrains_Mono'] text-[11px] text-[#64748B] hover:text-[#EF4444] transition-colors flex items-center gap-1 cursor-pointer keycap-3d px-2.5 py-1 rounded"
                 id="clearBtn"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-3 h-3" />
                 Clear
               </button>
             </div>
@@ -699,10 +701,13 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
             {/* 1. LINK & QR CODE SECTION */}
             {activeMode === 'link_qr' && linkQrSubMode === 'link' && (
               <div className="flex flex-col gap-3">
-                <label className="font-['JetBrains_Mono'] text-xs text-[#94A3B8] flex items-center gap-1.5">
-                  <Link2 className="w-4 h-4 text-[#4cd7f6]" />
-                  Enter Suspicious URL, Domain, or Tracking Link
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="font-['JetBrains_Mono'] text-xs text-[#94A3B8] flex items-center gap-1.5">
+                    <Link2 className="w-4 h-4 text-[#4cd7f6]" />
+                    Enter Suspicious URL, Domain, or Tracking Link
+                  </label>
+                  <span className="text-[10px] font-mono text-cyan-400">Click text to select all</span>
+                </div>
                 <div className="relative">
                   <input
                     type="url"
@@ -711,9 +716,21 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                       setInputLink(e.target.value);
                       setVerificationError(null);
                     }}
+                    onClick={(e) => e.currentTarget.select()}
+                    onFocus={(e) => e.currentTarget.select()}
                     placeholder="https://suspicious-login-domain.xyz/auth"
-                    className="w-full bg-[#06090E] border border-white/10 rounded-lg p-3 text-sm font-['JetBrains_Mono'] text-[#F8FAFC] placeholder:text-[#64748B] focus:outline-none focus:border-[#4cd7f6] transition-colors"
+                    className="w-full bg-[#06090E] border border-white/10 rounded-lg p-3 pr-10 text-sm font-['JetBrains_Mono'] text-[#F8FAFC] placeholder:text-[#64748B] focus:outline-none focus:border-[#4cd7f6] input-3d-inset transition-colors"
                   />
+                  {inputLink && (
+                    <button
+                      type="button"
+                      onClick={() => setInputLink('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-400 p-1 cursor-pointer transition-colors"
+                      title="Clear URL"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Link Presets */}
@@ -721,7 +738,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                   <span className="text-[11px] font-['JetBrains_Mono'] text-[#64748B] uppercase">
                     Test Verified Samples:
                   </span>
-                  <div className="grid grid-cols-2 gap-1.5">
+                  <div className="grid grid-cols-2 gap-2">
                     {LINK_PRESETS.map((preset, idx) => (
                       <button
                         key={idx}
@@ -729,10 +746,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                           setInputLink(preset.url);
                           setVerificationError(null);
                         }}
-                        className={`text-left px-2.5 py-1.5 rounded text-xs font-['JetBrains_Mono'] border transition-all cursor-pointer truncate ${
+                        className={`keycap-3d text-left px-3 py-2 rounded-lg text-xs font-['JetBrains_Mono'] transition-all cursor-pointer truncate ${
                           inputLink === preset.url
-                            ? 'bg-[#06b6d4]/15 border-[#06b6d4]/50 text-[#4cd7f6]'
-                            : 'bg-[#181c24] border-white/5 text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B]'
+                            ? 'keycap-3d-active text-[#003640]'
+                            : 'text-[#94A3B8] hover:text-[#F8FAFC]'
                         }`}
                       >
                         {preset.label}
@@ -816,28 +833,45 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
             {/* 2. EMAIL INSPECTION SECTION */}
             {activeMode === 'email' && emailSubMode === 'paste' && (
               <div className="flex flex-col gap-3">
-                <label className="font-['JetBrains_Mono'] text-xs text-[#94A3B8] flex items-center gap-1.5">
-                  <Mail className="w-4 h-4 text-[#4cd7f6]" />
-                  Paste Email Headers, Body, or Verification Link
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="font-['JetBrains_Mono'] text-xs text-[#94A3B8] flex items-center gap-1.5">
+                    <Mail className="w-4 h-4 text-[#4cd7f6]" />
+                    Paste Email Headers, Body, or Verification Link
+                  </label>
+                  <span className="text-[10px] font-mono text-cyan-400">Click text to select all</span>
+                </div>
 
-                <textarea
-                  value={inputEmailText}
-                  onChange={(e) => {
-                    setInputEmailText(e.target.value);
-                    setVerificationError(null);
-                  }}
-                  rows={8}
-                  placeholder="Paste From:, Subject:, email content, or sender verification link..."
-                  className="w-full bg-[#06090E] border border-white/10 rounded-lg p-3 text-xs font-['JetBrains_Mono'] text-[#dfe2ee] placeholder:text-[#64748B] focus:outline-none focus:border-[#4cd7f6] resize-y"
-                />
+                <div className="relative">
+                  <textarea
+                    value={inputEmailText}
+                    onChange={(e) => {
+                      setInputEmailText(e.target.value);
+                      setVerificationError(null);
+                    }}
+                    onClick={(e) => e.currentTarget.select()}
+                    onFocus={(e) => e.currentTarget.select()}
+                    rows={8}
+                    placeholder="Paste From:, Subject:, email content, or sender verification link..."
+                    className="w-full bg-[#06090E] border border-white/10 rounded-lg p-3 text-xs font-['JetBrains_Mono'] text-[#dfe2ee] placeholder:text-[#64748B] focus:outline-none focus:border-[#4cd7f6] input-3d-inset resize-y"
+                  />
+                  {inputEmailText && (
+                    <button
+                      type="button"
+                      onClick={() => setInputEmailText('')}
+                      className="absolute right-2 top-2 keycap-3d px-2 py-0.5 rounded text-slate-400 hover:text-red-400 text-[10px] font-mono cursor-pointer transition-colors"
+                      title="Clear email text"
+                    >
+                      Clear text
+                    </button>
+                  )}
+                </div>
 
                 {/* Email Presets */}
                 <div className="flex flex-col gap-1.5 pt-1">
                   <span className="text-[11px] font-['JetBrains_Mono'] text-[#64748B] uppercase">
                     Test Sample Email Threats:
                   </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     {EMAIL_PRESETS.map((preset, idx) => (
                       <button
                         key={idx}
@@ -845,10 +879,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                           setInputEmailText(preset.text);
                           setVerificationError(null);
                         }}
-                        className={`text-left px-2.5 py-1.5 rounded text-xs font-['JetBrains_Mono'] border transition-all cursor-pointer truncate ${
+                        className={`keycap-3d text-left px-3 py-2 rounded-lg text-xs font-['JetBrains_Mono'] transition-all cursor-pointer truncate ${
                           inputEmailText === preset.text
-                            ? 'bg-[#06b6d4]/15 border-[#06b6d4]/50 text-[#4cd7f6]'
-                            : 'bg-[#181c24] border-white/5 text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B]'
+                            ? 'keycap-3d-active text-[#003640]'
+                            : 'text-[#94A3B8] hover:text-[#F8FAFC]'
                         }`}
                       >
                         {preset.label}
@@ -936,28 +970,45 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
             {/* 3. MESSAGE / SMS SECTION */}
             {activeMode === 'text' && textSubMode === 'write' && (
               <div className="flex flex-col gap-3">
-                <label className="font-['JetBrains_Mono'] text-xs text-[#94A3B8] flex items-center gap-1.5">
-                  <MessageSquare className="w-4 h-4 text-[#4cd7f6]" />
-                  Write or Paste SMS / Chat Message Text
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="font-['JetBrains_Mono'] text-xs text-[#94A3B8] flex items-center gap-1.5">
+                    <MessageSquare className="w-4 h-4 text-[#4cd7f6]" />
+                    Write or Paste SMS / Chat Message Text
+                  </label>
+                  <span className="text-[10px] font-mono text-cyan-400">Click text to select all</span>
+                </div>
 
-                <textarea
-                  value={inputText}
-                  onChange={(e) => {
-                    setInputText(e.target.value);
-                    setVerificationError(null);
-                  }}
-                  rows={6}
-                  placeholder="Paste SMS text, WhatsApp message, or fraud notification..."
-                  className="w-full bg-[#06090E] border border-white/10 rounded-lg p-3 text-xs font-['JetBrains_Mono'] text-[#dfe2ee] placeholder:text-[#64748B] focus:outline-none focus:border-[#4cd7f6] resize-y"
-                />
+                <div className="relative">
+                  <textarea
+                    value={inputText}
+                    onChange={(e) => {
+                      setInputText(e.target.value);
+                      setVerificationError(null);
+                    }}
+                    onClick={(e) => e.currentTarget.select()}
+                    onFocus={(e) => e.currentTarget.select()}
+                    rows={6}
+                    placeholder="Paste SMS text, WhatsApp message, or fraud notification..."
+                    className="w-full bg-[#06090E] border border-white/10 rounded-lg p-3 text-xs font-['JetBrains_Mono'] text-[#dfe2ee] placeholder:text-[#64748B] focus:outline-none focus:border-[#4cd7f6] input-3d-inset resize-y"
+                  />
+                  {inputText && (
+                    <button
+                      type="button"
+                      onClick={() => setInputText('')}
+                      className="absolute right-2 top-2 keycap-3d px-2 py-0.5 rounded text-slate-400 hover:text-red-400 text-[10px] font-mono cursor-pointer transition-colors"
+                      title="Clear message text"
+                    >
+                      Clear text
+                    </button>
+                  )}
+                </div>
 
                 {/* SMS Presets */}
                 <div className="flex flex-col gap-1.5 pt-1">
                   <span className="text-[11px] font-['JetBrains_Mono'] text-[#64748B] uppercase">
                     Test Sample Messages:
                   </span>
-                  <div className="grid grid-cols-2 gap-1.5">
+                  <div className="grid grid-cols-2 gap-2">
                     {TEXT_PRESETS.map((preset, idx) => (
                       <button
                         key={idx}
@@ -965,10 +1016,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                           setInputText(preset.text);
                           setVerificationError(null);
                         }}
-                        className={`text-left px-2.5 py-1.5 rounded text-xs font-['JetBrains_Mono'] border transition-all cursor-pointer truncate ${
+                        className={`keycap-3d text-left px-3 py-2 rounded-lg text-xs font-['JetBrains_Mono'] transition-all cursor-pointer truncate ${
                           inputText === preset.text
-                            ? 'bg-[#06b6d4]/15 border-[#06b6d4]/50 text-[#4cd7f6]'
-                            : 'bg-[#181c24] border-white/5 text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B]'
+                            ? 'keycap-3d-active text-[#003640]'
+                            : 'text-[#94A3B8] hover:text-[#F8FAFC]'
                         }`}
                       >
                         {preset.label}
@@ -1066,7 +1117,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
               <button
                 onClick={handleRunVerification}
                 disabled={isVerifying}
-                className="w-full py-3 px-4 rounded-xl bg-[#06b6d4] hover:bg-[#4cd7f6] text-[#003640] font-['Space_Grotesk'] font-bold text-sm flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.35)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 px-4 rounded-xl btn-3d-cyan font-['Space_Grotesk'] font-bold text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 id="runVerificationBtn"
               >
                 {isVerifying ? (
@@ -1111,13 +1162,15 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
         {/* RIGHT PANEL: Threat Inspector HUD (7 cols) */}
         <div className="lg:col-span-7 flex flex-col gap-4">
           {/* 1. DECISIVE VERDICT BANNER ("SHOULD AVOID OR NOT") */}
-          <div
-            className={`rounded-xl p-5 border shadow-xl flex flex-col gap-4 relative overflow-hidden transition-all ${
+          <TiltCard3D
+            maxTilt={5}
+            scale={1.01}
+            id="verdictBanner"
+            className={`rounded-xl p-5 border shadow-xl flex flex-col gap-4 relative overflow-hidden transition-all card-3d-bevel ${
               isAvoid
                 ? 'bg-[#181014] border-[#EF4444]/40 shadow-[0_0_25px_rgba(239,68,68,0.15)]'
                 : 'bg-[#0a1815] border-[#10B981]/40 shadow-[0_0_25px_rgba(16,185,129,0.15)]'
             }`}
-            id="verdictBanner"
           >
             {/* Top Bar: Source badge and score */}
             <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
@@ -1208,7 +1261,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
                 </p>
               </div>
             )}
-          </div>
+          </TiltCard3D>
 
           {/* 2. SPECIFIC INDICATORS & TECHNICAL RED FLAGS */}
           <div className="bg-[#111827] rounded-xl p-4 md:p-5 border border-white/8 shadow-xl flex flex-col gap-3">
