@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { soundFX } from '../utils/soundEffects';
 
 interface TiltCard3DProps {
   children: React.ReactNode;
@@ -42,7 +43,7 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
     );
 
     setGlareStyle({
-      opacity: 0.15,
+      opacity: 0.18,
       x: (x / rect.width) * 100,
       y: (y / rect.height) * 100,
     });
@@ -57,7 +58,10 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
     <div
       ref={cardRef}
       id={id}
-      onClick={onClick}
+      onClick={() => {
+        soundFX.click();
+        onClick?.();
+      }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       className={`relative transition-transform duration-200 ease-out will-change-transform ${className}`}
@@ -71,7 +75,7 @@ export const TiltCard3D: React.FC<TiltCard3DProps> = ({
         className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300 z-10 overflow-hidden"
         style={{
           opacity: glareStyle.opacity,
-          background: `radial-gradient(circle at ${glareStyle.x}% ${glareStyle.y}%, rgba(255,255,255,0.4) 0%, rgba(6,182,212,0.1) 40%, transparent 80%)`,
+          background: `radial-gradient(circle at ${glareStyle.x}% ${glareStyle.y}%, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.06) 40%, transparent 80%)`,
         }}
       />
       {children}

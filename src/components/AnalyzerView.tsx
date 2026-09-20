@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { analyzeMessage, PRESET_MESSAGES } from '../utils/heuristics';
 import { AnalysisResult, NavigationTab, UploadMode, AIVerificationResult } from '../types';
 import { TiltCard3D } from './TiltCard3D';
+import { soundFX } from '../utils/soundEffects';
 import {
   Terminal,
   Trash2,
@@ -40,6 +41,8 @@ import {
 interface AnalyzerViewProps {
   onNavigate?: (tab: NavigationTab) => void;
   onLogAnalysis?: (text: string, result: AnalysisResult) => void;
+  initialPayload?: string | null;
+  onClearInitialPayload?: () => void;
 }
 
 // Preset samples for Links
@@ -159,7 +162,12 @@ const SAMPLE_PHISHING_SCREENSHOT_DATA = `data:image/svg+xml;utf8,<svg xmlns="htt
 
 const SAMPLE_QR_CODE_DATA = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" fill="%23ffffff"/><rect x="30" y="30" width="70" height="70" fill="%23000000"/><rect x="40" y="40" width="50" height="50" fill="%23ffffff"/><rect x="50" y="50" width="30" height="30" fill="%23000000"/><rect x="200" y="30" width="70" height="70" fill="%23000000"/><rect x="210" y="40" width="50" height="50" fill="%23ffffff"/><rect x="220" y="50" width="30" height="30" fill="%23000000"/><rect x="30" y="200" width="70" height="70" fill="%23000000"/><rect x="40" y="210" width="50" height="50" fill="%23ffffff"/><rect x="50" y="220" width="30" height="30" fill="%23000000"/><rect x="130" y="30" width="20" height="20" fill="%23000000"/><rect x="160" y="50" width="20" height="20" fill="%23000000"/><rect x="120" y="100" width="60" height="60" fill="%23000000"/><rect x="140" y="120" width="20" height="20" fill="%23ffffff"/><rect x="120" y="180" width="20" height="40" fill="%23000000"/><rect x="160" y="200" width="30" height="30" fill="%23000000"/><rect x="200" y="130" width="70" height="20" fill="%23000000"/><rect x="220" y="170" width="50" height="30" fill="%23000000"/><rect x="230" y="220" width="40" height="50" fill="%23000000"/><text x="40" y="290" font-family="monospace" font-size="10" fill="%23ef4444">QUISHING TARGET: http://pay-fast.top/qr</text></svg>`;
 
-export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAnalysis }) => {
+export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
+  onNavigate,
+  onLogAnalysis,
+  initialPayload,
+  onClearInitialPayload,
+}) => {
   // Primary Ingestion Mode: 'link_qr' | 'email' | 'text'
   const [activeMode, setActiveMode] = useState<UploadMode>('link_qr');
 
@@ -243,6 +251,26 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
   });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Handle incoming threat payload from Command Hub radar or live feed
+  useEffect(() => {
+    if (initialPayload) {
+      if (initialPayload.startsWith('http://') || initialPayload.startsWith('https://')) {
+        setActiveMode('link_qr');
+        setLinkQrSubMode('link');
+        setInputLink(initialPayload);
+      } else {
+        setActiveMode('text');
+        setTextSubMode('write');
+        setInputText(initialPayload);
+      }
+      soundFX.scan();
+      const res = analyzeMessage(initialPayload);
+      setHeuristicAnalysis(res);
+      onLogAnalysis?.(initialPayload, res);
+      onClearInitialPayload?.();
+    }
+  }, [initialPayload]);
 
   // Clear inputs
   const handleClear = () => {
@@ -436,6 +464,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
       }
     }
 
+    soundFX.scan();
     try {
       const response = await fetch('/api/verify', {
         method: 'POST',
@@ -455,6 +484,11 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
 
       const data = await response.json();
       setAiResult(data);
+      if (data.shouldAvoid || data.riskScore >= 60) {
+        soundFX.threatAlert();
+      } else {
+        soundFX.success();
+      }
     } catch (err: any) {
       console.warn('Threat verification API warning, generating defensive verdict:', err);
       // Construct robust fallback analysis
@@ -487,6 +521,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({ onNavigate, onLogAna
         source: 'google-ai-studio',
       };
       setAiResult(fallbackVerdict);
+      soundFX.threatAlert();
     } finally {
       setIsVerifying(false);
     }

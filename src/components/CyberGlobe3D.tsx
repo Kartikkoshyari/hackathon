@@ -1,41 +1,44 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { soundFX } from '../utils/soundEffects';
 
-interface ThreatPin {
+export interface ThreatPin {
   lat: number;
   lon: number;
   label: string;
   threatType: string;
   risk: number;
   color: string;
+  target?: string;
+  vector?: string;
 }
 
-const GLOBAL_THREAT_PINS: ThreatPin[] = [
-  { lat: 37.77, lon: -122.42, label: 'San Francisco', threatType: 'Quishing QR Skim', risk: 96, color: '#ef4444' },
-  { lat: 40.71, lon: -74.01, label: 'New York', threatType: 'Chase Bank Spoof', risk: 98, color: '#ef4444' },
-  { lat: 51.51, lon: -0.13, label: 'London', threatType: 'HMRC Tax Refund Trap', risk: 92, color: '#f59e0b' },
-  { lat: 50.11, lon: 8.68, label: 'Frankfurt', threatType: 'Workday BEC Redirection', risk: 95, color: '#ef4444' },
-  { lat: 35.68, lon: 139.69, label: 'Tokyo', threatType: 'Amazon Account Lockout', risk: 91, color: '#06b6d4' },
-  { lat: 1.35, lon: 103.82, label: 'Singapore', threatType: 'Telegram Credential Stealer', risk: 94, color: '#f59e0b' },
-  { lat: -33.87, lon: 151.21, label: 'Sydney', threatType: 'MyGov Smishing Vector', risk: 93, color: '#10b981' },
-  { lat: 19.43, lon: -99.13, label: 'Mexico City', threatType: 'WhatsApp Impersonation', risk: 89, color: '#f59e0b' },
-  { lat: 28.61, lon: 77.21, label: 'New Delhi', threatType: 'Electricity Bill Smishing', risk: 97, color: '#ef4444' },
-  { lat: 25.20, lon: 55.27, label: 'Dubai', threatType: 'Courier Fee Micro-Charge', risk: 90, color: '#06b6d4' },
+export const GLOBAL_THREAT_PINS: ThreatPin[] = [
+  { lat: 37.77, lon: -122.42, label: 'San Francisco', threatType: 'Quishing QR Skim', risk: 96, color: '#ef4444', target: 'http://pay-fast.top/qr-payment?spot=81', vector: 'QR Quishing' },
+  { lat: 40.71, lon: -74.01, label: 'New York', threatType: 'Chase Bank Spoof', risk: 98, color: '#ef4444', target: 'https://chase-security-verify882.xyz/login', vector: 'Credential Phishing' },
+  { lat: 51.51, lon: -0.13, label: 'London', threatType: 'HMRC Tax Refund Trap', risk: 92, color: '#f59e0b', target: 'https://hmrc-tax-refund-gov.co/claim', vector: 'Tax Smishing' },
+  { lat: 50.11, lon: 8.68, label: 'Frankfurt', threatType: 'Workday BEC Redirection', risk: 95, color: '#ef4444', target: 'https://workday-sso-auth99.net/portal', vector: 'Corporate BEC' },
+  { lat: 35.68, lon: 139.69, label: 'Tokyo', threatType: 'Amazon Account Lockout', risk: 91, color: '#ffffff', target: 'https://amazon-jp-security.club/re-auth', vector: 'Account Takeover' },
+  { lat: 1.35, lon: 103.82, label: 'Singapore', threatType: 'Telegram Session Stealer', risk: 94, color: '#f59e0b', target: 'https://t-me-login-security.info', vector: 'Session Hijack' },
+  { lat: -33.87, lon: 151.21, label: 'Sydney', threatType: 'MyGov Smishing Vector', risk: 93, color: '#10b981', target: 'https://mygov-au-portal.link', vector: 'Gov Impersonation' },
+  { lat: 19.43, lon: -99.13, label: 'Mexico City', threatType: 'WhatsApp Impersonation', risk: 89, color: '#f59e0b', target: 'https://wa-verify-chat.site', vector: 'Social Smishing' },
+  { lat: 28.61, lon: 77.21, label: 'New Delhi', threatType: 'Electricity Bill Smishing', risk: 97, color: '#ef4444', target: 'https://power-bill-payment.biz', vector: 'Utility Fraud' },
+  { lat: 25.20, lon: 55.27, label: 'Dubai', threatType: 'Courier Fee Micro-Charge', risk: 90, color: '#ffffff', target: 'https://emirates-post-track.online', vector: 'Delivery Phish' },
 ];
 
 // Major continental bounding regions for dense 3D particle generation
 const CONTINENT_ZONES = [
   // North America
-  { minLat: 15, maxLat: 70, minLon: -165, maxLon: -55, density: 420 },
+  { minLat: 15, maxLat: 70, minLon: -165, maxLon: -55, density: 440 },
   // South America
-  { minLat: -55, maxLat: 12, minLon: -80, maxLon: -35, density: 250 },
+  { minLat: -55, maxLat: 12, minLon: -80, maxLon: -35, density: 260 },
   // Europe
-  { minLat: 36, maxLat: 71, minLon: -10, maxLon: 45, density: 340 },
+  { minLat: 36, maxLat: 71, minLon: -10, maxLon: 45, density: 360 },
   // Asia
-  { minLat: 5, maxLat: 72, minLon: 45, maxLon: 145, density: 560 },
+  { minLat: 5, maxLat: 72, minLon: 45, maxLon: 145, density: 600 },
   // Africa
-  { minLat: -35, maxLat: 37, minLon: -18, maxLon: 52, density: 360 },
+  { minLat: -35, maxLat: 37, minLon: -18, maxLon: 52, density: 380 },
   // Australia / Oceania
-  { minLat: -44, maxLat: -10, minLon: 112, maxLon: 154, density: 190 },
+  { minLat: -44, maxLat: -10, minLon: 112, maxLon: 154, density: 200 },
 ];
 
 interface Point3D {
@@ -52,22 +55,52 @@ export const CyberGlobe3D: React.FC<{
   className?: string;
   height?: number;
   interactive?: boolean;
-}> = ({ className = '', height = 480, interactive = true }) => {
+  onSelectThreat?: (threat: ThreatPin) => void;
+}> = ({ className = '', height = 480, interactive = true, onSelectThreat }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activePin, setActivePin] = useState<ThreatPin | null>(GLOBAL_THREAT_PINS[0]);
   const [isDragging, setIsDragging] = useState(false);
+  const [isAutoSpin, setIsAutoSpin] = useState(true);
 
   // Rotation state stored in refs for 60fps loop
   const rotRef = useRef({
     x: 0.25, // tilt angle (pitch)
     y: -0.6, // rotation angle (yaw)
+    targetX: 0.25,
+    targetY: -0.6,
     vx: 0,
-    vy: 0.0035, // constant gentle rotation
+    vy: 0.003, // constant gentle rotation
     lastMouseX: 0,
     lastMouseY: 0,
     isInteracting: false,
+    hasTarget: false,
   });
+
+  const focusRegion = (region: 'americas' | 'europe' | 'apac' | 'free') => {
+    soundFX.click();
+    const rot = rotRef.current;
+    if (region === 'free') {
+      setIsAutoSpin(true);
+      rot.hasTarget = false;
+      return;
+    }
+    setIsAutoSpin(false);
+    rot.hasTarget = true;
+    if (region === 'americas') {
+      rot.targetX = 0.35;
+      rot.targetY = 1.65;
+      setActivePin(GLOBAL_THREAT_PINS[0]);
+    } else if (region === 'europe') {
+      rot.targetX = 0.45;
+      rot.targetY = -0.15;
+      setActivePin(GLOBAL_THREAT_PINS[2]);
+    } else if (region === 'apac') {
+      rot.targetX = 0.3;
+      rot.targetY = -2.25;
+      setActivePin(GLOBAL_THREAT_PINS[4]);
+    }
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -197,11 +230,19 @@ export const CyberGlobe3D: React.FC<{
 
       // Auto rotation when not dragging
       if (!rot.isInteracting) {
-        rot.y += rot.vy;
-        rot.vx *= 0.94;
-        rot.x += rot.vx;
-        // Clamp pitch so globe doesn't invert
-        rot.x = Math.max(-0.8, Math.min(0.8, rot.x));
+        if (rot.hasTarget) {
+          rot.x += (rot.targetX - rot.x) * 0.08;
+          rot.y += (rot.targetY - rot.y) * 0.08;
+          if (Math.abs(rot.targetX - rot.x) < 0.005 && Math.abs(rot.targetY - rot.y) < 0.005) {
+            rot.hasTarget = false;
+          }
+        } else if (isAutoSpin) {
+          rot.y += rot.vy;
+          rot.vx *= 0.94;
+          rot.x += rot.vx;
+          // Clamp pitch so globe doesn't invert
+          rot.x = Math.max(-0.8, Math.min(0.8, rot.x));
+        }
       }
 
       ctx.clearRect(0, 0, width, heightPx);
@@ -209,11 +250,11 @@ export const CyberGlobe3D: React.FC<{
       const cx = width / 2;
       const cy = heightPx / 2;
 
-      // 1. Draw atmospheric outer rim aura (v1.png style)
+      // 1. Draw atmospheric outer rim aura (Monochromatic frost styling)
       const grad = ctx.createRadialGradient(cx, cy, radius * 0.75, cx, cy, radius * 1.35);
-      grad.addColorStop(0, 'rgba(6, 182, 212, 0.08)');
-      grad.addColorStop(0.5, 'rgba(6, 182, 212, 0.04)');
-      grad.addColorStop(0.85, 'rgba(6, 182, 212, 0.015)');
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.06)');
+      grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.025)');
+      grad.addColorStop(0.85, 'rgba(255, 255, 255, 0.008)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -221,7 +262,7 @@ export const CyberGlobe3D: React.FC<{
       ctx.fill();
 
       // Atmospheric outer ring
-      ctx.strokeStyle = 'rgba(76, 215, 246, 0.15)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(cx, cy, radius * 1.02, 0, Math.PI * 2);
@@ -459,20 +500,99 @@ export const CyberGlobe3D: React.FC<{
       <canvas ref={canvasRef} className="block w-full h-full" />
 
       {/* Floating 3D Control HUD Badges */}
-      <div className="absolute top-4 left-4 flex items-center gap-2 pointer-events-none">
-        <div className="px-2.5 py-1 rounded-md bg-[#0b111e]/90 border border-cyan-500/30 text-cyan-400 font-mono text-[10px] flex items-center gap-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-          <span>3D SPHERICAL TELEMETRY</span>
-        </div>
-        <div className="hidden sm:flex px-2 py-1 rounded-md bg-[#0b111e]/80 border border-white/10 text-slate-400 font-mono text-[10px]">
-          DRAG TO ROTATE
+      <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
+        <div className="px-2.5 py-1 rounded-full bg-black/80 border border-white/15 text-white font-mono text-[10px] flex items-center gap-1.5 shadow-lg backdrop-blur-md">
+          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+          <span>3D SPHERICAL RADAR</span>
         </div>
       </div>
 
-      <div className="absolute top-4 right-4 flex items-center gap-2 pointer-events-none">
-        <div className="px-2.5 py-1 rounded-md bg-red-950/80 border border-red-500/40 text-red-400 font-mono text-[10px] flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-          <span>INTERCEPT MATRIX ACTIVE</span>
+      <div className="absolute top-3 right-3 flex items-center gap-2">
+        <div className="px-2.5 py-1 rounded-full bg-red-950/80 border border-red-500/40 text-red-400 font-mono text-[10px] flex items-center gap-1.5 backdrop-blur-md">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span>LIVE THREAT MATRIX</span>
+        </div>
+      </div>
+
+      {/* Region Fast Focus Selector Bar */}
+      <div className="absolute bottom-3 left-3 right-3 flex flex-col gap-2">
+        {/* Active Pin Details Strip */}
+        {activePin && (
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/85 backdrop-blur-md border border-white/15 text-xs shadow-xl">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: activePin.color }} />
+              <div className="flex flex-col">
+                <span className="font-['Space_Grotesk'] font-bold text-white tracking-tight">
+                  {activePin.label} <span className="text-neutral-400 font-normal text-[11px]">— {activePin.threatType}</span>
+                </span>
+                <span className="font-mono text-[9px] text-neutral-400">
+                  RISK SCORE: <strong className="text-red-400">{activePin.risk}%</strong> | LATENCY: 0.4ms
+                </span>
+              </div>
+            </div>
+
+            {onSelectThreat && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  soundFX.click();
+                  onSelectThreat(activePin);
+                }}
+                className="px-2.5 py-1 rounded-full bg-white text-black font-semibold text-[11px] hover:bg-neutral-200 active:scale-95 transition-all cursor-pointer"
+              >
+                Inspect Payload
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Region Orbit Buttons */}
+        <div className="flex items-center justify-between gap-1 p-1 rounded-full bg-[#080b12]/90 border border-white/10 backdrop-blur-md">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                focusRegion('americas');
+              }}
+              className="px-2.5 py-1 rounded-full text-[10px] font-mono text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              Americas
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                focusRegion('europe');
+              }}
+              className="px-2.5 py-1 rounded-full text-[10px] font-mono text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              Europe
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                focusRegion('apac');
+              }}
+              className="px-2.5 py-1 rounded-full text-[10px] font-mono text-neutral-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              Asia-Pac
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              focusRegion('free');
+            }}
+            className="px-2.5 py-1 rounded-full text-[10px] font-mono text-neutral-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer flex items-center gap-1"
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${isAutoSpin ? 'bg-emerald-400' : 'bg-neutral-500'}`} />
+            <span>{isAutoSpin ? 'Auto-Spin' : 'Free Orbit'}</span>
+          </button>
         </div>
       </div>
     </div>

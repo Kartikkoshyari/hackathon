@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { NavigationTab } from '../types';
 import { analyzeMessage, PRESET_MESSAGES } from '../utils/heuristics';
 import { CyberGlobe3D } from './CyberGlobe3D';
+import { CrystallineShield3D } from './CrystallineShield3D';
 import { TiltCard3D } from './TiltCard3D';
+import { soundFX } from '../utils/soundEffects';
 import {
   ShieldCheck,
   Zap,
@@ -33,7 +35,7 @@ import {
 } from 'lucide-react';
 
 interface HomeViewProps {
-  onNavigate: (tab: NavigationTab) => void;
+  onNavigate: (tab: NavigationTab, payload?: string) => void;
 }
 
 interface LiveThreatEvent {
@@ -100,6 +102,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   const [liveThreats, setLiveThreats] = useState<LiveThreatEvent[]>(INITIAL_LIVE_THREATS);
   const [interceptedCount, setInterceptedCount] = useState(19482);
   const [activePreset, setActivePreset] = useState<'bank' | 'urgency' | 'package'>('bank');
+  const [hero3DMode, setHero3DMode] = useState<'radar' | 'shield'>('radar');
 
   // Dynamic live defense telemetry stream
   useEffect(() => {
@@ -175,40 +178,31 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
 
   return (
     <div className="w-full flex flex-col gap-10 py-2">
-      {/* HERO SECTION: 3D CYBER SPHERICAL COMMAND DECK (v1.png Inspiration) */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#0a0f19] via-[#080d16] to-[#06090e] border border-cyan-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-        {/* Subtle Cyber Grid Matrix */}
-        <div
-          className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle at 50% 50%, #06b6d4 1px, transparent 1px), linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px)`,
-            backgroundSize: '44px 44px, 44px 44px, 44px 44px',
-          }}
-        />
-
+      {/* HERO SECTION: 3D CYBER SPHERICAL COMMAND DECK */}
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#0e121c] via-[#090d14] to-[#05070a] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
         {/* Ambient Glows */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[140px] pointer-events-none" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-white/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 right-0 w-[500px] h-[500px] rounded-full bg-white/5 blur-[140px] pointer-events-none" />
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-8 md:p-12 items-center">
           {/* Left Hero Column: Tactical Mission & 3D Key Triggers (7 cols) */}
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div className="flex flex-wrap items-center gap-2.5">
-              <div className="keycap-3d inline-flex items-center gap-2 px-3 py-1 rounded-md text-[#4cd7f6] font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-[#4cd7f6] animate-ping" />
+              <div className="keycap-3d inline-flex items-center gap-2 px-3 py-1 rounded-full text-white font-['JetBrains_Mono'] text-xs font-semibold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-white animate-ping" />
                 <span>DEFENSE ENGINE v4.8 ACTIVE</span>
               </div>
-              <div className="keycap-3d inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[#10B981] font-['JetBrains_Mono'] text-xs font-semibold">
+              <div className="keycap-3d inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-emerald-400 font-['JetBrains_Mono'] text-xs font-semibold">
                 <Activity className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '4s' }} />
                 <span>0.4ms LOCAL PARSING</span>
               </div>
             </div>
 
             <div className="space-y-3">
-              <h1 className="font-['Space_Grotesk'] text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#F8FAFC] leading-[1.08]">
-                Real-Time Threat <span className="text-[#22d3ee] drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">Deconstruction</span> &amp; Attack Defense
+              <h1 className="font-['Space_Grotesk'] text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.08]">
+                Real-Time Threat <span className="text-neutral-200 underline decoration-white/30 underline-offset-8">Deconstruction</span> &amp; Attack Defense
               </h1>
-              <p className="text-base sm:text-lg text-[#94A3B8] leading-relaxed max-w-2xl font-['Inter']">
+              <p className="text-base sm:text-lg text-neutral-400 leading-relaxed max-w-2xl font-['Inter']">
                 ScamShield exposes malicious intent behind spoofed banking notifications, fraudulent QR quishing traps, and deceptive links. Inspect payloads with deterministic sub-millisecond scoring.
               </p>
             </div>
@@ -267,19 +261,58 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          {/* Right Hero Column: Interactive 3D Cyber Particle Globe (5 cols - v1.png Style) */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
-            <div className="w-full max-w-[460px] aspect-square rounded-2xl bg-[#080d17]/80 border border-cyan-500/20 shadow-[0_10px_35px_rgba(0,0,0,0.7)] p-2 relative overflow-hidden flex items-center justify-center">
-              <CyberGlobe3D height={420} className="w-full h-full rounded-xl" interactive={true} />
+          {/* Right Hero Column: Interactive 3D Cyber Deck with Switcher */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative gap-3">
+            {/* 3D Telemetry Mode Selector */}
+            <div className="flex items-center gap-1 p-1 rounded-full bg-black/75 backdrop-blur-md border border-white/15 z-20 shadow-lg">
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.click();
+                  setHero3DMode('radar');
+                }}
+                className={`px-3.5 py-1 rounded-full text-xs font-['Space_Grotesk'] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  hero3DMode === 'radar'
+                    ? 'bg-white text-black shadow-sm'
+                    : 'text-neutral-400 hover:text-white'
+                }`}
+              >
+                <Globe2 className="w-3.5 h-3.5" />
+                <span>3D Global Radar</span>
+              </button>
 
-              {/* Tactical Globe Telemetry Floating Legend */}
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between p-2 rounded-lg bg-[#06090e]/85 backdrop-blur-md border border-white/10 text-[11px] font-mono">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  <span className="text-slate-200">LIVE TARGET INTERCEPT</span>
-                </div>
-                <span className="text-cyan-400">SPIN TO INSPECT</span>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.click();
+                  setHero3DMode('shield');
+                }}
+                className={`px-3.5 py-1 rounded-full text-xs font-['Space_Grotesk'] font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  hero3DMode === 'shield'
+                    ? 'bg-white text-black shadow-sm'
+                    : 'text-neutral-400 hover:text-white'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>3D Crystalline Aegis</span>
+              </button>
+            </div>
+
+            {/* 3D Canvas Stage */}
+            <div className="w-full max-w-[480px] aspect-square rounded-2xl bg-[#0a0d14]/90 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.9)] p-2 relative overflow-hidden flex items-center justify-center">
+              {hero3DMode === 'radar' ? (
+                <CyberGlobe3D
+                  height={440}
+                  className="w-full h-full rounded-xl"
+                  interactive={true}
+                  onSelectThreat={(threat) => onNavigate('analyzer', threat.target || threat.label)}
+                />
+              ) : (
+                <CrystallineShield3D
+                  className="w-full h-full rounded-xl"
+                  onClick={() => soundFX.scan()}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -346,9 +379,22 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
                   </div>
                 </div>
 
-                <span className="text-[10px] font-mono font-bold text-red-400 shrink-0 px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20">
-                  {threat.risk}% RISK
-                </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="text-[10px] font-mono font-bold text-red-400 px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/20">
+                    {threat.risk}%
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundFX.click();
+                      onNavigate('analyzer', threat.target);
+                    }}
+                    className="px-2 py-0.5 rounded bg-white text-black font-semibold text-[10px] hover:bg-neutral-200 transition-colors cursor-pointer"
+                    title="Inspect this threat in Analyzer"
+                  >
+                    Inspect
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -356,15 +402,15 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
       </section>
 
       {/* INTERACTIVE LIVE HEURISTIC TESTBENCH (With Click-to-Select-All Feature) */}
-      <section className="relative rounded-2xl bg-[#0b111e] p-6 md:p-8 border border-white/10 shadow-2xl space-y-4">
+      <section className="relative rounded-2xl bg-[#0e121c] p-6 md:p-8 border border-white/10 shadow-2xl space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div>
-            <h2 className="font-['Space_Grotesk'] text-xl font-bold text-[#F8FAFC] flex items-center gap-2">
-              <Terminal className="w-5 h-5 text-[#22d3ee]" />
+            <h2 className="font-['Space_Grotesk'] text-xl font-bold text-white flex items-center gap-2">
+              <Terminal className="w-5 h-5 text-neutral-300" />
               Live Heuristic Evaluation Testbench
             </h2>
-            <p className="text-xs text-[#94A3B8]">
-              Click any text below to <strong className="text-cyan-400">auto-select all</strong> and replace or remove instantly.
+            <p className="text-xs text-neutral-400">
+              Click any text below to <strong className="text-white">auto-select all</strong> and replace or remove instantly.
             </p>
           </div>
 
@@ -472,7 +518,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
             </div>
 
             <button
-              onClick={() => onNavigate('analyzer')}
+              onClick={() => {
+                soundFX.click();
+                onNavigate('analyzer', quickTestText);
+              }}
               className="btn-3d-cyan px-4 py-2.5 rounded-lg font-['Space_Grotesk'] text-xs font-bold flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
               Inspect in Engine

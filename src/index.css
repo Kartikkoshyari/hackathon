@@ -1,31 +1,31 @@
 @import "tailwindcss";
 
 @theme {
-  --color-surface-base: #0B0F17;
-  --color-surface-obsidian: #06090E;
-  --color-surface-elevated: #111827;
-  --color-surface-highlight: #1E293B;
-  --color-surface-container-lowest: #0a0e16;
-  --color-surface-container-low: #181c24;
-  --color-surface-container: #1c2028;
-  --color-surface-container-high: #262a33;
-  --color-surface-container-highest: #31353e;
+  --color-surface-base: #05070a;
+  --color-surface-obsidian: #030407;
+  --color-surface-elevated: #0e121c;
+  --color-surface-highlight: #161c2b;
+  --color-surface-container-lowest: #05070a;
+  --color-surface-container-low: #090d14;
+  --color-surface-container: #0e121c;
+  --color-surface-container-high: #141926;
+  --color-surface-container-highest: #1a2133;
 
-  --color-primary: #4cd7f6;
-  --color-primary-container: #06b6d4;
-  --color-on-primary: #003640;
-  --color-secondary: #4edea3;
-  --color-tertiary: #ffb95f;
-  --color-threat-critical: #EF4444;
-  --color-threat-warning: #F59E0B;
-  --color-threat-safe: #10B981;
-  --color-terminal-cyan: #22D3EE;
+  --color-primary: #ffffff;
+  --color-primary-container: #e2e8f0;
+  --color-on-primary: #000000;
+  --color-secondary: #cbd5e1;
+  --color-tertiary: #f59e0b;
+  --color-threat-critical: #ef4444;
+  --color-threat-warning: #f59e0b;
+  --color-threat-safe: #10b981;
+  --color-terminal-cyan: #e2e8f0;
 
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted: #64748B;
-  --color-border-subtle: rgba(255, 255, 255, 0.08);
-  --color-border-glowing: rgba(6, 182, 212, 0.35);
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-border-subtle: rgba(255, 255, 255, 0.1);
+  --color-border-glowing: rgba(255, 255, 255, 0.25);
 
   --font-space: "Space Grotesk", sans-serif;
   --font-inter: "Inter", sans-serif;
@@ -38,22 +38,26 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B0F17;
+  background: #05070a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #1e2536;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #06b6d4;
+  background: #475569;
+}
+
+.glow-white {
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
 }
 
 .glow-cyan {
-  box-shadow: 0 0 20px -3px rgba(6, 182, 212, 0.45);
+  box-shadow: 0 0 20px -3px rgba(255, 255, 255, 0.18);
 }
 
 .glow-cyan-lg {
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.35);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
 }
 
 .glow-red {
@@ -64,133 +68,120 @@
   box-shadow: 0 0 15px -2px rgba(16, 185, 129, 0.4);
 }
 
-/* 3D Tactile Buttons & Keycaps (Hardware Cyber-Deck Aesthetic) */
-.btn-3d-cyan {
-  background: linear-gradient(180deg, #22d3ee 0%, #06b6d4 100%);
-  color: #003640;
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  border-right: 1px solid rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid #0891b2;
-  box-shadow: 0 3px 0 #0e7490, 0 6px 14px rgba(6, 182, 212, 0.35);
-  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+/* High-Contrast Luxury Monochromatic Buttons (Frostbreak Aesthetic) */
+.btn-3d-cyan,
+.btn-monochrome-white {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 2px 0 #cbd5e1, 0 6px 16px rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1) !important;
   transform: translateY(0);
 }
-.btn-3d-cyan:hover {
-  background: linear-gradient(180deg, #67e8f9 0%, #22d3ee 100%);
-  box-shadow: 0 4px 0 #0e7490, 0 8px 18px rgba(6, 182, 212, 0.45);
+.btn-3d-cyan:hover,
+.btn-monochrome-white:hover {
+  background: #f1f5f9 !important;
+  box-shadow: 0 3px 0 #94a3b8, 0 8px 20px rgba(255, 255, 255, 0.25) !important;
   transform: translateY(-1px);
 }
-.btn-3d-cyan:active {
-  box-shadow: 0 1px 0 #0e7490, 0 2px 4px rgba(6, 182, 212, 0.3);
-  transform: translateY(3px);
+.btn-3d-cyan:active,
+.btn-monochrome-white:active {
+  box-shadow: 0 1px 0 #94a3b8, 0 2px 6px rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(2px);
 }
 
-.btn-3d-dark {
-  background: linear-gradient(180deg, #1e293b 0%, #111827 100%);
-  color: #f8fafc;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  border-right: 1px solid rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid #090d16;
-  box-shadow: 0 3px 0 #070a12, 0 6px 12px rgba(0, 0, 0, 0.45);
-  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+.btn-3d-dark,
+.btn-monochrome-dark {
+  background: linear-gradient(180deg, #141926 0%, #0c0f17 100%) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 2px 0 #05070a, 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateY(0);
 }
-.btn-3d-dark:hover {
-  background: linear-gradient(180deg, #283548 0%, #172033 100%);
-  box-shadow: 0 4px 0 #070a12, 0 8px 16px rgba(0, 0, 0, 0.55);
+.btn-3d-dark:hover,
+.btn-monochrome-dark:hover {
+  background: linear-gradient(180deg, #1a2233 0%, #101521 100%) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
   transform: translateY(-1px);
 }
-.btn-3d-dark:active {
-  box-shadow: 0 1px 0 #070a12, 0 2px 4px rgba(0, 0, 0, 0.4);
-  transform: translateY(3px);
+.btn-3d-dark:active,
+.btn-monochrome-dark:active {
+  box-shadow: 0 1px 0 #05070a, 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(2px);
 }
 
 .btn-3d-emerald {
-  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
-  color: #022c22;
-  border-top: 1px solid rgba(255, 255, 255, 0.4);
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
   border-bottom: 1px solid #047857;
-  box-shadow: 0 3px 0 #065f46, 0 6px 14px rgba(16, 185, 129, 0.35);
-  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0);
+  box-shadow: 0 2px 0 #065f46, 0 6px 14px rgba(16, 185, 129, 0.3);
+  transition: all 0.15s ease;
 }
 .btn-3d-emerald:hover {
-  background: linear-gradient(180deg, #6ee7b7 0%, #34d399 100%);
-  box-shadow: 0 4px 0 #065f46, 0 8px 18px rgba(16, 185, 129, 0.45);
+  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
   transform: translateY(-1px);
 }
 .btn-3d-emerald:active {
-  box-shadow: 0 1px 0 #065f46, 0 2px 4px rgba(16, 185, 129, 0.3);
-  transform: translateY(3px);
+  transform: translateY(2px);
 }
 
 .btn-3d-red {
-  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
-  color: #450a0a;
-  border-top: 1px solid rgba(255, 255, 255, 0.35);
-  border-bottom: 1px solid #b91c1c;
-  box-shadow: 0 3px 0 #991b1b, 0 6px 14px rgba(239, 68, 68, 0.35);
-  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0);
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid #991b1b;
+  box-shadow: 0 2px 0 #7f1d1d, 0 6px 14px rgba(239, 68, 68, 0.3);
+  transition: all 0.15s ease;
 }
 .btn-3d-red:hover {
-  background: linear-gradient(180deg, #fca5a5 0%, #f87171 100%);
-  box-shadow: 0 4px 0 #991b1b, 0 8px 18px rgba(239, 68, 68, 0.45);
+  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
   transform: translateY(-1px);
 }
 .btn-3d-red:active {
-  box-shadow: 0 1px 0 #991b1b, 0 2px 4px rgba(239, 68, 68, 0.3);
-  transform: translateY(3px);
+  transform: translateY(2px);
 }
 
 /* Tactile 3D Keycap for presets, tags, shortcuts */
 .keycap-3d {
-  background: linear-gradient(180deg, #1e2536 0%, #101624 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  border-left: 1px solid rgba(255, 255, 255, 0.07);
-  border-right: 1px solid rgba(0, 0, 0, 0.3);
-  border-bottom: 2px solid #080c14;
-  box-shadow: 0 2px 0 #05080e, 0 4px 8px rgba(0, 0, 0, 0.35);
+  background: #0e121c !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 2px 0 #05070a, 0 4px 8px rgba(0, 0, 0, 0.4) !important;
+  color: #94a3b8 !important;
   transition: all 0.12s ease;
   user-select: none;
 }
 .keycap-3d:hover {
-  border-top-color: rgba(76, 215, 246, 0.5);
-  box-shadow: 0 3px 0 #05080e, 0 6px 12px rgba(6, 182, 212, 0.25);
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
   transform: translateY(-1px);
 }
 .keycap-3d:active {
-  border-bottom-width: 1px;
-  box-shadow: 0 1px 0 #05080e, 0 2px 4px rgba(0, 0, 0, 0.3);
   transform: translateY(2px);
 }
 .keycap-3d-active {
-  background: linear-gradient(180deg, #06b6d4 0%, #0891b2 100%) !important;
-  color: #003640 !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
-  border-bottom: 2px solid #0e7490 !important;
-  box-shadow: 0 2px 0 #0e7490, 0 4px 10px rgba(6, 182, 212, 0.4) !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: 0 2px 0 #cbd5e1, 0 4px 12px rgba(255, 255, 255, 0.2) !important;
+  font-weight: 700 !important;
 }
 
 /* 3D Hardware Bevel for Panels & HUD Cards */
 .card-3d-bevel {
-  background: linear-gradient(180deg, rgba(17, 24, 39, 0.92) 0%, rgba(11, 15, 23, 0.95) 100%);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-left: 1px solid rgba(255, 255, 255, 0.06);
-  border-right: 1px solid rgba(0, 0, 0, 0.4);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, rgba(14, 18, 28, 0.95) 0%, rgba(8, 11, 18, 0.98) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
 }
 
 .input-3d-inset {
-  background: #06090e;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05);
+  background: #080b12 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6) !important;
 }
 .input-3d-inset:focus-within {
-  border-color: #22d3ee;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(6, 182, 212, 0.3);
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.15) !important;
 }
-

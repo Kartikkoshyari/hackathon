@@ -1,4 +1,4 @@
-export type NavigationTab = 'home' | 'analyzer' | 'simulator' | 'dashboard';
+export type NavigationTab = 'cover' | 'home' | 'analyzer' | 'simulator' | 'dashboard';
 export type UploadMode = 'link_qr' | 'email' | 'text' | 'image';
 
 export type Severity = 'LOW' | 'MED' | 'HIGH' | 'CRITICAL';
