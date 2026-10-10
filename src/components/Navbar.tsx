@@ -27,6 +27,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, userXp 
     { id: 'analyzer', label: 'Threat Analyzer' },
     { id: 'simulator', label: 'Attack Simulator' },
     { id: 'dashboard', label: 'Threat Intel' },
+    { id: 'chat', label: 'AI Cyber Copilot' },
   ];
 
   const handleNavClick = (tab: NavigationTab) => {
@@ -139,7 +140,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, userXp 
           <div className="flex items-center justify-between pb-2 border-b border-white/5">
             <span className="text-xs font-['JetBrains_Mono'] text-emerald-400 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Sandbox Isolated (0.4ms)
+              Real-Time Wire Speed (Active)
             </span>
             <span className="text-xs font-['JetBrains_Mono'] text-neutral-300">{userXp} XP</span>
           </div>

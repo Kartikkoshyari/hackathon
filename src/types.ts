@@ -1,5 +1,20 @@
-export type NavigationTab = 'cover' | 'home' | 'analyzer' | 'simulator' | 'dashboard';
+export type NavigationTab = 'cover' | 'home' | 'analyzer' | 'simulator' | 'dashboard' | 'chat';
 export type UploadMode = 'link_qr' | 'email' | 'text' | 'image';
+
+export interface ChatSource {
+  uri: string;
+  title: string;
+}
+
+export interface ChatMessageItem {
+  id: string;
+  role: 'user' | 'model';
+  text: string;
+  timestamp: number;
+  sources?: ChatSource[];
+  model?: string;
+  grounded?: boolean;
+}
 
 export type Severity = 'LOW' | 'MED' | 'HIGH' | 'CRITICAL';
 export type RiskLevel = 'safe' | 'warning' | 'critical';

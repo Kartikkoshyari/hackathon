@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { analyzeMessage, PRESET_MESSAGES } from '../utils/heuristics';
 import { AnalysisResult, NavigationTab, UploadMode, AIVerificationResult } from '../types';
 import { TiltCard3D } from './TiltCard3D';
+import { CrystallineShield3D, ShieldVerdictTheme } from './CrystallineShield3D';
 import { soundFX } from '../utils/soundEffects';
 import {
   Terminal,
@@ -210,11 +212,36 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
   // Verification & Analysis states
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [elapsedScanTime, setElapsedScanTime] = useState<number>(0);
+  const [lastAnalysisDuration, setLastAnalysisDuration] = useState<number | null>(null);
 
   // Local heuristic fallback analysis for text/email
   const [heuristicAnalysis, setHeuristicAnalysis] = useState<AnalysisResult>(() =>
     analyzeMessage(TEXT_PRESETS[0].text)
   );
+
+  // 3D Crystalline Aegis Shield State (Threat Monitor)
+  const [shieldTheme, setShieldTheme] = useState<ShieldVerdictTheme>('scam');
+  const [shieldBurstTrigger, setShieldBurstTrigger] = useState<number>(() => Date.now());
+  const [isShieldShattered, setIsShieldShattered] = useState<boolean>(true);
+
+  // Framer-Motion Crystal Aegis Burst Overlay State
+  const [burstActivation, setBurstActivation] = useState<{
+    id: number;
+    type: ShieldVerdictTheme;
+    title: string;
+    subtitle: string;
+  } | null>(null);
+
+  // Auto-dismiss burst overlay after animation completes
+  useEffect(() => {
+    if (burstActivation) {
+      const timer = setTimeout(() => {
+        setBurstActivation(null);
+      }, 2600);
+      return () => clearTimeout(timer);
+    }
+  }, [burstActivation]);
 
   // AI Verification Result
   const [aiResult, setAiResult] = useState<AIVerificationResult | null>({
@@ -267,6 +294,33 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
       soundFX.scan();
       const res = analyzeMessage(initialPayload);
       setHeuristicAnalysis(res);
+      const isCritical = res.riskLevel === 'critical';
+      const isSafe = res.riskLevel === 'safe';
+      const initialTheme: ShieldVerdictTheme = isCritical ? 'scam' : isSafe ? 'legit' : 'warning';
+      setShieldTheme(initialTheme);
+      setShieldBurstTrigger(Date.now());
+      setIsShieldShattered(isCritical);
+
+      setBurstActivation({
+        id: Date.now(),
+        type: initialTheme,
+        title: isCritical
+          ? 'CRYSTAL AEGIS // SCAM BREACH DEFLECTED'
+          : isSafe
+          ? 'CRYSTAL AEGIS // VERIFIED SAFE DEFENSE'
+          : 'CRYSTAL AEGIS // ELEVATED THREAT WARNING',
+        subtitle: isCritical
+          ? 'High-risk deception vector intercepted • Protective countermeasures engaged'
+          : isSafe
+          ? 'Authoritative security signatures verified • Safe to proceed'
+          : 'Anomalous indicators detected • Exercise heightened scrutiny',
+      });
+
+      if (isCritical) {
+        soundFX.scamThreatBurst();
+      } else if (isSafe) {
+        soundFX.legitShieldBurst();
+      }
       onLogAnalysis?.(initialPayload, res);
       onClearInitialPayload?.();
     }
@@ -274,6 +328,8 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
 
   // Clear inputs
   const handleClear = () => {
+    setShieldTheme('neutral');
+    setIsShieldShattered(false);
     if (activeMode === 'link_qr') {
       if (linkQrSubMode === 'link') {
         setInputLink('');
@@ -371,10 +427,24 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
     }
   };
 
+  // Elapsed scan timer during verification
+  useEffect(() => {
+    if (!isVerifying) {
+      setElapsedScanTime(0);
+      return;
+    }
+    const t0 = performance.now();
+    const timer = setInterval(() => {
+      setElapsedScanTime(Math.round(performance.now() - t0));
+    }, 100);
+    return () => clearInterval(timer);
+  }, [isVerifying]);
+
   // Execute verification against /api/verify
   const handleRunVerification = async () => {
     setIsVerifying(true);
     setVerificationError(null);
+    const startScanTs = performance.now();
 
     let verifyType: string = 'text';
     let verifyPayload: any = '';
@@ -464,13 +534,21 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
       }
     }
 
-    soundFX.scan();
+    soundFX.shieldCharge();
+
+    // AbortController with 9-second hard client deadline to prevent any UI freeze
+    const abortCtrl = new AbortController();
+    const abortTimer = setTimeout(() => {
+      abortCtrl.abort();
+    }, 9000);
+
     try {
       const response = await fetch('/api/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        signal: abortCtrl.signal,
         body: JSON.stringify({
           type: verifyType,
           payload: verifyPayload,
@@ -478,19 +556,69 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
         }),
       });
 
+      clearTimeout(abortTimer);
+
       if (!response.ok) {
         throw new Error(`Server returned status ${response.status}`);
       }
 
       const data = await response.json();
+      const durationMs = Math.round(performance.now() - startScanTs);
+      setLastAnalysisDuration(durationMs);
       setAiResult(data);
-      if (data.shouldAvoid || data.riskScore >= 60) {
-        soundFX.threatAlert();
+
+      const isScamVerdict = Boolean(
+        data.shouldAvoid ||
+        data.riskScore >= 60 ||
+        data.riskLevel === 'critical' ||
+        String(data.verdict || '').toUpperCase().includes('AVOID')
+      );
+      const isLegitVerdict = Boolean(
+        !data.shouldAvoid &&
+        data.riskScore < 45 &&
+        data.riskLevel === 'safe' &&
+        String(data.verdict || '').toUpperCase().includes('SAFE')
+      );
+
+      const targetTheme: ShieldVerdictTheme = isScamVerdict
+        ? 'scam'
+        : isLegitVerdict
+        ? 'legit'
+        : 'warning';
+
+      setShieldTheme(targetTheme);
+      setShieldBurstTrigger(Date.now());
+      setIsShieldShattered(isScamVerdict);
+
+      // Trigger Framer-Motion Crystal Aegis burst overlay over the analyzer interface
+      setBurstActivation({
+        id: Date.now(),
+        type: targetTheme,
+        title: isScamVerdict
+          ? 'CRYSTAL AEGIS // SCAM BREACH DEFLECTED'
+          : isLegitVerdict
+          ? 'CRYSTAL AEGIS // VERIFIED SAFE DEFENSE'
+          : 'CRYSTAL AEGIS // ELEVATED THREAT WARNING',
+        subtitle: isScamVerdict
+          ? 'High-risk deception vector intercepted • Protective countermeasures engaged'
+          : isLegitVerdict
+          ? 'Authoritative security signatures verified • Safe to proceed'
+          : 'Anomalous indicators detected • Exercise heightened scrutiny',
+      });
+
+      if (isScamVerdict) {
+        soundFX.scamThreatBurst();
+      } else if (isLegitVerdict) {
+        soundFX.legitShieldBurst();
       } else {
-        soundFX.success();
+        soundFX.warningBurst();
       }
     } catch (err: any) {
+      clearTimeout(abortTimer);
+      const durationMs = Math.round(performance.now() - startScanTs);
+      setLastAnalysisDuration(durationMs);
       console.warn('Threat verification API warning, generating defensive verdict:', err);
+
       // Construct robust fallback analysis
       const fallbackVerdict: AIVerificationResult = {
         verdict: 'AVOID',
@@ -518,10 +646,22 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
           'Verify requests via independent phone contact with the official entity.',
           'Flag and quarantine the communication.',
         ],
-        source: 'google-ai-studio',
+        source: 'local-threat-engine',
+        latencyMs: durationMs,
       };
       setAiResult(fallbackVerdict);
-      soundFX.threatAlert();
+      setShieldTheme('scam');
+      setShieldBurstTrigger(Date.now());
+      setIsShieldShattered(true);
+
+      setBurstActivation({
+        id: Date.now(),
+        type: 'scam',
+        title: 'CRYSTAL AEGIS // SCAM BREACH DEFLECTED',
+        subtitle: 'Defensive heuristic override triggered • Malicious trap quarantined',
+      });
+
+      soundFX.scamThreatBurst();
     } finally {
       setIsVerifying(false);
     }
@@ -532,7 +672,232 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
   const verdictText = aiResult?.verdict ?? (heuristicAnalysis.riskLevel === 'critical' ? 'AVOID' : 'SUSPICIOUS');
 
   return (
-    <div className="w-full flex flex-col gap-6">
+    <div className="w-full flex flex-col gap-6 relative">
+      {/* Framer-Motion Crystal Aegis Color-Coded Burst Overlay */}
+      <AnimatePresence>
+        {burstActivation && (
+          <motion.div
+            key={burstActivation.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+            className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden"
+          >
+            {/* 1. Full-screen Edge Flash & Vignette Glow */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 0.85, 0] }}
+              transition={{ duration: 2.5, times: [0, 0.08, 0.7, 1] }}
+              className={`absolute inset-0 ${
+                burstActivation.type === 'scam'
+                  ? 'shadow-[inset_0_0_140px_rgba(239,68,68,0.6),0_0_90px_rgba(239,68,68,0.45)]'
+                  : burstActivation.type === 'legit'
+                  ? 'shadow-[inset_0_0_140px_rgba(16,185,129,0.6),0_0_90px_rgba(16,185,129,0.45)]'
+                  : 'shadow-[inset_0_0_120px_rgba(245,158,11,0.5),0_0_70px_rgba(245,158,11,0.35)]'
+              }`}
+              style={{
+                background:
+                  burstActivation.type === 'scam'
+                    ? 'radial-gradient(circle at 50% 32%, rgba(239, 68, 68, 0.38) 0%, rgba(185, 28, 28, 0.12) 50%, transparent 80%)'
+                    : burstActivation.type === 'legit'
+                    ? 'radial-gradient(circle at 50% 32%, rgba(16, 185, 129, 0.38) 0%, rgba(5, 150, 105, 0.12) 50%, transparent 80%)'
+                    : 'radial-gradient(circle at 50% 32%, rgba(245, 158, 11, 0.32) 0%, rgba(180, 83, 9, 0.1) 50%, transparent 80%)',
+              }}
+            />
+
+            {/* 2. Concentric Shockwave Ring 1 */}
+            <motion.div
+              initial={{ scale: 0.1, opacity: 1 }}
+              animate={{ scale: [0.1, 2.3], opacity: [1, 0] }}
+              transition={{ duration: 1.4, ease: 'easeOut' }}
+              className={`absolute w-[440px] h-[440px] rounded-full border-2 ${
+                burstActivation.type === 'scam'
+                  ? 'border-red-500 shadow-[0_0_40px_rgba(239,68,68,0.85)]'
+                  : burstActivation.type === 'legit'
+                  ? 'border-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.85)]'
+                  : 'border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.85)]'
+              }`}
+            />
+
+            {/* 3. Concentric Shockwave Ring 2 (Dashed secondary harmonic) */}
+            <motion.div
+              initial={{ scale: 0.1, opacity: 0.85 }}
+              animate={{ scale: [0.1, 2.9], opacity: [0.85, 0] }}
+              transition={{ duration: 1.7, ease: 'easeOut', delay: 0.14 }}
+              className={`absolute w-[440px] h-[440px] rounded-full border border-dashed ${
+                burstActivation.type === 'scam'
+                  ? 'border-red-400 shadow-[0_0_25px_rgba(239,68,68,0.65)]'
+                  : burstActivation.type === 'legit'
+                  ? 'border-emerald-300 shadow-[0_0_25px_rgba(16,185,129,0.65)]'
+                  : 'border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.65)]'
+              }`}
+            />
+
+            {/* 4. Radial Crystalline Shard Particles */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              {Array.from({ length: 12 }).map((_, i) => {
+                const angle = (i * 30 * Math.PI) / 180;
+                const distance = 160 + (i % 3) * 60;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ x: 0, y: 0, scale: 0, opacity: 1, rotate: 0 }}
+                    animate={{
+                      x: tx,
+                      y: ty,
+                      scale: [0, 1.4, 0],
+                      opacity: [1, 1, 0],
+                      rotate: i * 45 + 90,
+                    }}
+                    transition={{ duration: 1.3, ease: 'easeOut', delay: 0.04 }}
+                    className={`absolute w-3.5 h-3.5 ${
+                      burstActivation.type === 'scam'
+                        ? 'bg-red-400 shadow-[0_0_15px_#ef4444]'
+                        : burstActivation.type === 'legit'
+                        ? 'bg-emerald-400 shadow-[0_0_15px_#10b981]'
+                        : 'bg-amber-400 shadow-[0_0_15px_#f59e0b]'
+                    }`}
+                    style={{
+                      clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+                    }}
+                  />
+                );
+              })}
+            </div>
+
+            {/* 5. Central High-Tech Crystal Aegis Activation HUD Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: -30, scale: 0.9 }}
+              animate={{
+                opacity: [0, 1, 1, 0],
+                y: [-30, 0, 0, -20],
+                scale: [0.9, 1, 1, 0.96],
+              }}
+              transition={{
+                duration: 2.5,
+                times: [0, 0.12, 0.78, 1],
+                ease: 'easeOut',
+              }}
+              className={`relative max-w-xl mx-4 p-5 rounded-2xl border backdrop-blur-xl shadow-2xl flex flex-col items-center text-center gap-2.5 ${
+                burstActivation.type === 'scam'
+                  ? 'bg-black/90 border-red-500/60 shadow-[0_0_55px_rgba(239,68,68,0.5)]'
+                  : burstActivation.type === 'legit'
+                  ? 'bg-black/90 border-emerald-500/60 shadow-[0_0_55px_rgba(16,185,129,0.5)]'
+                  : 'bg-black/90 border-amber-500/60 shadow-[0_0_45px_rgba(245,158,11,0.45)]'
+              }`}
+            >
+              {/* Corner Cyber Brackets */}
+              <div
+                className={`absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 ${
+                  burstActivation.type === 'scam'
+                    ? 'border-red-400'
+                    : burstActivation.type === 'legit'
+                    ? 'border-emerald-400'
+                    : 'border-amber-400'
+                }`}
+              />
+              <div
+                className={`absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 ${
+                  burstActivation.type === 'scam'
+                    ? 'border-red-400'
+                    : burstActivation.type === 'legit'
+                    ? 'border-emerald-400'
+                    : 'border-amber-400'
+                }`}
+              />
+              <div
+                className={`absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 ${
+                  burstActivation.type === 'scam'
+                    ? 'border-red-400'
+                    : burstActivation.type === 'legit'
+                    ? 'border-emerald-400'
+                    : 'border-amber-400'
+                }`}
+              />
+              <div
+                className={`absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 ${
+                  burstActivation.type === 'scam'
+                    ? 'border-red-400'
+                    : burstActivation.type === 'legit'
+                    ? 'border-emerald-400'
+                    : 'border-amber-400'
+                }`}
+              />
+
+              {/* Status Header Badge */}
+              <div className="flex items-center gap-2">
+                {burstActivation.type === 'scam' ? (
+                  <ShieldAlert className="w-5 h-5 text-red-400 animate-pulse" />
+                ) : burstActivation.type === 'legit' ? (
+                  <ShieldCheck className="w-5 h-5 text-emerald-400 animate-pulse" />
+                ) : (
+                  <AlertTriangle className="w-5 h-5 text-amber-400 animate-pulse" />
+                )}
+                <span
+                  className={`font-['JetBrains_Mono'] text-xs font-bold uppercase tracking-widest ${
+                    burstActivation.type === 'scam'
+                      ? 'text-red-400'
+                      : burstActivation.type === 'legit'
+                      ? 'text-emerald-400'
+                      : 'text-amber-400'
+                  }`}
+                >
+                  {burstActivation.type === 'scam'
+                    ? '🔴 RED BURST ACTIVATED'
+                    : burstActivation.type === 'legit'
+                    ? '🟢 GREEN BURST ACTIVATED'
+                    : '🟡 AMBER BURST ACTIVATED'}
+                </span>
+              </div>
+
+              {/* Headline */}
+              <h2
+                className={`font-['Space_Grotesk'] text-xl sm:text-2xl font-extrabold tracking-tight ${
+                  burstActivation.type === 'scam'
+                    ? 'text-white drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]'
+                    : burstActivation.type === 'legit'
+                    ? 'text-white drop-shadow-[0_0_20px_rgba(16,185,129,0.8)]'
+                    : 'text-white drop-shadow-[0_0_15px_rgba(245,158,11,0.8)]'
+                }`}
+              >
+                {burstActivation.title}
+              </h2>
+
+              {/* Subtitle */}
+              <p className="text-xs sm:text-sm text-neutral-300 font-['Inter'] leading-relaxed max-w-md">
+                {burstActivation.subtitle}
+              </p>
+
+              {/* Audio & Energy Frequency Meters */}
+              <div className="flex items-center gap-1 pt-1">
+                {Array.from({ length: 9 }).map((_, barIdx) => (
+                  <motion.span
+                    key={barIdx}
+                    animate={{ height: ['4px', `${12 + (barIdx % 4) * 6}px`, '4px'] }}
+                    transition={{
+                      duration: 0.6,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                      delay: barIdx * 0.06,
+                    }}
+                    className={`w-1 rounded-full ${
+                      burstActivation.type === 'scam'
+                        ? 'bg-red-400'
+                        : burstActivation.type === 'legit'
+                        ? 'bg-emerald-400'
+                        : 'bg-amber-400'
+                    }`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hidden File Input */}
       <input
         ref={fileInputRef}
@@ -571,7 +936,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 THREAT DEFENSE
               </span>
               <span className="text-[#869397] text-xs">|</span>
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#64748B]">ONLINE (0.4ms)</span>
+              <span className="font-['JetBrains_Mono'] text-[11px] text-[#64748B]">ONLINE (REAL-TIME SPEED)</span>
             </div>
           </div>
         </div>
@@ -1157,13 +1522,21 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
               >
                 {isVerifying ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw className="w-4 h-4 animate-spin text-cyan-300" />
                     <span>Analyzing Threat Vector...</span>
+                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-black/40 text-cyan-300">
+                      {(elapsedScanTime / 1000).toFixed(1)}s
+                    </span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 fill-current" />
+                    <Zap className="w-4 h-4 fill-current text-cyan-300" />
                     <span>Verify with Threat Defense Engine</span>
+                    {lastAnalysisDuration !== null && (
+                      <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-black/30 text-emerald-400 font-normal">
+                        ⚡ {(lastAnalysisDuration / 1000).toFixed(2)}s
+                      </span>
+                    )}
                   </>
                 )}
               </button>
@@ -1173,7 +1546,10 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   <Lock className="w-3.5 h-3.5" />
                   <span>Zero-Telemetry Guarantee</span>
                 </div>
-                <span className="text-[#94A3B8]">Multi-Vector Analysis</span>
+                <div className="flex items-center gap-1.5 text-cyan-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <span>Turbo Scan Engine Active</span>
+                </div>
               </div>
             </div>
           </div>
@@ -1196,6 +1572,48 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
 
         {/* RIGHT PANEL: Threat Inspector HUD (7 cols) */}
         <div className="lg:col-span-7 flex flex-col gap-4">
+          {/* 3D CRYSTALLINE AEGIS VERIFICATION CORE & THREAT MONITOR */}
+          <div
+            className={`relative rounded-2xl border transition-all duration-700 overflow-hidden shadow-2xl ${
+              shieldTheme === 'scam'
+                ? 'bg-gradient-to-b from-[#1a080d] via-[#100609] to-[#070305] border-red-500/50 shadow-[0_0_40px_rgba(239,68,68,0.3)]'
+                : shieldTheme === 'legit'
+                ? 'bg-gradient-to-b from-[#061812] via-[#04100c] to-[#030806] border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.3)]'
+                : shieldTheme === 'warning'
+                ? 'bg-gradient-to-b from-[#191106] via-[#110c04] to-[#080502] border-amber-500/50 shadow-[0_0_35px_rgba(245,158,11,0.25)]'
+                : 'bg-gradient-to-b from-[#0b101c] via-[#070b14] to-[#04060b] border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)]'
+            }`}
+          >
+            <div className="h-[250px] sm:h-[280px] w-full relative">
+              <CrystallineShield3D
+                className="w-full h-full"
+                verdictTheme={shieldTheme}
+                isScanning={isVerifying}
+                isShattered={isShieldShattered}
+                burstTrigger={shieldBurstTrigger}
+                showControls={true}
+                badgeLabel={
+                  shieldTheme === 'scam'
+                    ? '3D AEGIS: RED BURST DEFLECTION'
+                    : shieldTheme === 'legit'
+                    ? '3D AEGIS: GREEN BURST HARDENED'
+                    : shieldTheme === 'warning'
+                    ? '3D AEGIS: AMBER CAUTION PULSE'
+                    : '3D AEGIS THREAT MONITOR'
+                }
+                onClick={() => {
+                  if (shieldTheme === 'scam') {
+                    soundFX.scamThreatBurst();
+                  } else if (shieldTheme === 'legit') {
+                    soundFX.legitShieldBurst();
+                  } else {
+                    soundFX.scan();
+                  }
+                }}
+              />
+            </div>
+          </div>
+
           {/* 1. DECISIVE VERDICT BANNER ("SHOULD AVOID OR NOT") */}
           <TiltCard3D
             maxTilt={5}
@@ -1227,6 +1645,13 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 <span className="px-2.5 py-1 rounded bg-[#06b6d4]/10 text-[#4cd7f6] border border-[#06b6d4]/30 font-['JetBrains_Mono'] text-xs font-semibold">
                   Source: Google AI Studio
                 </span>
+
+                {(aiResult?.latencyMs !== undefined || lastAnalysisDuration !== null) && (
+                  <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300 font-['JetBrains_Mono'] text-[11px]">
+                    <span className="text-cyan-400">⚡</span>
+                    {((aiResult?.latencyMs ?? lastAnalysisDuration ?? 0) / 1000).toFixed(2)}s
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center gap-2">

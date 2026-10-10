@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationTab, RecentMessageLog, RiskLevel } from '../types';
 import { INITIAL_RECENT_MESSAGES } from '../data/mockTelemetry';
+import { ThreatNetworkMap } from './ThreatNetworkMap';
 import {
   Download,
   RotateCcw,
@@ -25,10 +26,11 @@ import {
   Info,
   ExternalLink,
   ChevronRight,
+  Activity,
 } from 'lucide-react';
 
 interface DashboardViewProps {
-  onNavigate: (tab: NavigationTab) => void;
+  onNavigate: (tab: NavigationTab, payload?: string) => void;
   recentMessages?: RecentMessageLog[];
   onResetSession?: () => void;
   simulatorStats?: {
@@ -343,6 +345,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Interactive D3.js Threat Topology Network Map Categorized by Risk Level */}
+      <ThreatNetworkMap onNavigate={onNavigate} />
 
       {/* Primary Asymmetric Section: Activity Feed (7 cols) + Mastery & Challenge (5 cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

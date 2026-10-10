@@ -1,9 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { soundFX } from '../utils/soundEffects';
 
-interface CrystallineShield3DProps {
+export type ShieldVerdictTheme = 'neutral' | 'scam' | 'legit' | 'warning';
+
+export interface CrystallineShield3DProps {
   className?: string;
   isShattered?: boolean;
+  verdictTheme?: ShieldVerdictTheme;
+  isScanning?: boolean;
+  burstTrigger?: number;
+  showControls?: boolean;
+  badgeLabel?: string;
   onShatterComplete?: () => void;
   onClick?: () => void;
 }
@@ -48,6 +55,11 @@ interface FloatingShard3D {
 export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
   className = '',
   isShattered = false,
+  verdictTheme = 'neutral',
+  isScanning = false,
+  burstTrigger,
+  showControls = true,
+  badgeLabel,
   onShatterComplete,
   onClick,
 }) => {
@@ -71,42 +83,81 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
     progress: isShattered ? 1 : 0,
   });
 
-  const impactPulseRef = useRef<{ active: boolean; radius: number; maxRadius: number; alpha: number }>({
+  const impactPulseRef = useRef<{
+    active: boolean;
+    radius: number;
+    maxRadius: number;
+    alpha: number;
+    color: string;
+    secondaryColor: string;
+  }>({
     active: false,
     radius: 0,
-    maxRadius: 200,
+    maxRadius: 280,
     alpha: 0,
+    color: 'rgba(255, 255, 255, 0.9)',
+    secondaryColor: 'rgba(255, 255, 255, 0.5)',
   });
 
   const triggerImpact = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     soundFX.scan();
+    const isRed = verdictTheme === 'scam';
+    const isGreen = verdictTheme === 'legit';
+    const isAmber = verdictTheme === 'warning';
+
+    const pColor = isRed
+      ? 'rgba(239, 68, 68, 0.95)'
+      : isGreen
+      ? 'rgba(16, 185, 129, 0.95)'
+      : isAmber
+      ? 'rgba(245, 158, 11, 0.95)'
+      : 'rgba(255, 255, 255, 0.95)';
+
+    const sColor = isRed
+      ? 'rgba(239, 68, 68, 0.5)'
+      : isGreen
+      ? 'rgba(16, 185, 129, 0.5)'
+      : isAmber
+      ? 'rgba(245, 158, 11, 0.5)'
+      : 'rgba(255, 255, 255, 0.5)';
+
     impactPulseRef.current = {
       active: true,
       radius: 5,
-      maxRadius: 240,
+      maxRadius: 300,
       alpha: 0.95,
+      color: pColor,
+      secondaryColor: sColor,
     };
   };
 
   const toggleShatter = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (!shatterState.current.triggered) {
-      soundFX.shatter();
+      if (verdictTheme === 'scam') {
+        soundFX.scamThreatBurst();
+      } else {
+        soundFX.shatter();
+      }
       shatterState.current.triggered = true;
       setShattered(true);
     } else {
-      soundFX.success();
+      if (verdictTheme === 'legit') {
+        soundFX.legitShieldBurst();
+      } else {
+        soundFX.success();
+      }
       shatterState.current.triggered = false;
       shatterState.current.progress = 0;
       setShattered(false);
     }
   };
 
+  // Sync external shatter state
   useEffect(() => {
     if (isShattered !== shatterState.current.triggered) {
       if (isShattered) {
-        soundFX.shatter();
         shatterState.current.triggered = true;
         setShattered(true);
       } else {
@@ -116,6 +167,51 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
       }
     }
   }, [isShattered]);
+
+  // Handle active burst triggers (e.g. when verification verdict arrives)
+  useEffect(() => {
+    if (burstTrigger !== undefined && burstTrigger > 0) {
+      const isRed = verdictTheme === 'scam';
+      const isGreen = verdictTheme === 'legit';
+      const isAmber = verdictTheme === 'warning';
+
+      impactPulseRef.current = {
+        active: true,
+        radius: 10,
+        maxRadius: 360,
+        alpha: 1,
+        color: isRed
+          ? 'rgba(239, 68, 68, 0.95)'
+          : isGreen
+          ? 'rgba(16, 185, 129, 0.95)'
+          : isAmber
+          ? 'rgba(245, 158, 11, 0.95)'
+          : 'rgba(255, 255, 255, 0.95)',
+        secondaryColor: isRed
+          ? 'rgba(239, 68, 68, 0.6)'
+          : isGreen
+          ? 'rgba(16, 185, 129, 0.6)'
+          : isAmber
+          ? 'rgba(245, 158, 11, 0.6)'
+          : 'rgba(255, 255, 255, 0.6)',
+      };
+
+      if (isRed) {
+        // Red Scam Burst: explode outward!
+        shatterState.current.triggered = true;
+        shatterState.current.progress = 0;
+        setShattered(true);
+      } else if (isGreen) {
+        // Green Legit Burst: protective harmonic reconstruction pulse!
+        shatterState.current.triggered = false;
+        shatterState.current.progress = 0;
+        setShattered(false);
+      } else {
+        // Warning or neutral
+        shatterState.current.progress = 0;
+      }
+    }
+  }, [burstTrigger, verdictTheme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -187,7 +283,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
       [9, 7, 6],
     ];
 
-    const facets: Facet3D[] = facetIndices.map(([i1, i2, i3], fIdx) => {
+    const facets: Facet3D[] = facetIndices.map(([i1, i2, i3]) => {
       // Geometric center for radial explosion
       const p1 = baseVertices[i1];
       const p2 = baseVertices[i2];
@@ -199,24 +295,23 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
 
       return {
         indices: [i1, i2, i3],
-        color: fIdx % 2 === 0 ? '#ffffff' : '#e2e8f0',
+        color: '#ffffff',
         alpha: 0.85,
         specular: 0.9,
-        // Outward explosion vectors with rotational spin
-        vx: (cx / dist) * (4 + Math.random() * 8) + (Math.random() - 0.5) * 4,
-        vy: (cy / dist) * (4 + Math.random() * 8) + (Math.random() - 0.5) * 4,
-        vz: (cz / dist) * 6 + Math.random() * 10,
+        vx: (cx / dist) * (5 + Math.random() * 9) + (Math.random() - 0.5) * 4,
+        vy: (cy / dist) * (5 + Math.random() * 9) + (Math.random() - 0.5) * 4,
+        vz: (cz / dist) * 7 + Math.random() * 11,
         rotX: 0,
         rotY: 0,
         rotZ: 0,
-        vRotX: (Math.random() - 0.5) * 0.12,
-        vRotY: (Math.random() - 0.5) * 0.12,
-        vRotZ: (Math.random() - 0.5) * 0.12,
+        vRotX: (Math.random() - 0.5) * 0.14,
+        vRotY: (Math.random() - 0.5) * 0.14,
+        vRotZ: (Math.random() - 0.5) * 0.14,
       };
     });
 
     // Generate orbiting 3D crystal shards
-    const shardCount = 22;
+    const shardCount = 26;
     const shards: FloatingShard3D[] = [];
     for (let i = 0; i < shardCount; i++) {
       shards.push({
@@ -225,12 +320,12 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         z: 0,
         size: Math.random() * 5 + 3,
         orbitRadius: baseScale * (1.1 + Math.random() * 0.8),
-        orbitSpeed: (Math.random() * 0.012 + 0.006) * (Math.random() > 0.5 ? 1 : -1),
+        orbitSpeed: (Math.random() * 0.014 + 0.007) * (Math.random() > 0.5 ? 1 : -1),
         orbitAngle: Math.random() * Math.PI * 2,
-        orbitInclination: (Math.random() - 0.5) * 0.8,
-        rotSpeed: (Math.random() - 0.5) * 0.04,
+        orbitInclination: (Math.random() - 0.5) * 0.85,
+        rotSpeed: (Math.random() - 0.5) * 0.05,
         rot: Math.random() * Math.PI * 2,
-        alpha: Math.random() * 0.5 + 0.3,
+        alpha: Math.random() * 0.5 + 0.35,
       });
     }
 
@@ -241,9 +336,46 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
       const ms = mouseState.current;
       const ss = shatterState.current;
 
-      // Smooth mouse interpolation (spring feel)
+      // Color Palette resolution based on verdictTheme
+      let r = 240;
+      let g = 245;
+      let b = 255;
+      let rHigh = 255;
+      let gHigh = 255;
+      let bHigh = 255;
+
+      if (verdictTheme === 'scam') {
+        // Red Burst (Scam / Threat)
+        r = 239;
+        g = 68;
+        b = 68;
+        rHigh = 254;
+        gHigh = 160;
+        bHigh = 160;
+      } else if (verdictTheme === 'legit') {
+        // Green Burst (Legit / Safe)
+        r = 16;
+        g = 185;
+        b = 129;
+        rHigh = 167;
+        gHigh = 243;
+        bHigh = 208;
+      } else if (verdictTheme === 'warning') {
+        // Amber Burst (Suspicious)
+        r = 245;
+        g = 158;
+        b = 11;
+        rHigh = 253;
+        gHigh = 230;
+        bHigh = 138;
+      }
+
+      // Smooth mouse interpolation
       ms.currentX += (ms.targetX - ms.currentX) * 0.08;
       ms.currentY += (ms.targetY - ms.currentY) * 0.08;
+
+      // Scanning rapid rotation booster
+      const scanSpeed = isScanning ? 0.08 : 0.02;
 
       // Handle shatter progress
       if (ss.triggered) {
@@ -258,9 +390,9 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
       const cx = width / 2;
       const cy = height / 2;
 
-      // 3D rotation angles from mouse
-      const rotY = ms.currentX * 0.55 + Math.sin(frameCount * 0.02) * 0.06;
-      const rotX = -ms.currentY * 0.45 + Math.cos(frameCount * 0.02) * 0.04;
+      // 3D rotation angles from mouse + scan spin
+      const rotY = ms.currentX * 0.55 + Math.sin(frameCount * scanSpeed) * 0.12;
+      const rotX = -ms.currentY * 0.45 + Math.cos(frameCount * scanSpeed) * 0.08;
 
       const cosY = Math.cos(rotY);
       const sinY = Math.sin(rotY);
@@ -269,13 +401,10 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
 
       // 3D Projection Helper
       const project = (x: number, y: number, z: number) => {
-        // Yaw (around Y)
         const x1 = x * cosY - z * sinY;
         const z1 = z * cosY + x * sinY;
-        // Pitch (around X)
         const y2 = y * cosX - z1 * sinX;
         const z2 = z1 * cosX + y * sinX;
-        // Perspective
         const fov = 750;
         const scale = fov / (fov + z2);
         return {
@@ -286,9 +415,9 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         };
       };
 
-      // 1. Render Orbiting 3D Shards (Back Hemisphere first)
+      // 1. Render Orbiting 3D Shards
       shards.forEach((s) => {
-        s.orbitAngle += s.orbitSpeed;
+        s.orbitAngle += s.orbitSpeed * (isScanning ? 2.5 : 1);
         s.rot += s.rotSpeed;
 
         const rawX = Math.cos(s.orbitAngle) * s.orbitRadius;
@@ -297,26 +426,25 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
 
         const p = project(rawX, rawY, rawZ);
 
-        // Disperse if shattered
         if (ss.triggered) {
-          s.orbitRadius += 6;
-          s.alpha = Math.max(0, s.alpha - 0.03);
+          s.orbitRadius += 7;
+          s.alpha = Math.max(0, s.alpha - 0.028);
         }
 
         if (s.alpha > 0.01) {
           ctx.save();
           ctx.translate(p.px, p.py);
           ctx.rotate(s.rot);
-          ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha * (p.pz > 0 ? 1 : 0.45)})`;
-          ctx.strokeStyle = `rgba(255, 255, 255, ${s.alpha * 0.8})`;
-          ctx.lineWidth = 0.8;
+          ctx.fillStyle = `rgba(${rHigh}, ${gHigh}, ${bHigh}, ${s.alpha * (p.pz > 0 ? 1 : 0.45)})`;
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${s.alpha * 0.85})`;
+          ctx.lineWidth = 0.9;
 
           // Diamond shard polygon
           ctx.beginPath();
           ctx.moveTo(0, -s.size * p.scale);
-          ctx.lineTo(s.size * 0.5 * p.scale, 0);
+          ctx.lineTo(s.size * 0.55 * p.scale, 0);
           ctx.lineTo(0, s.size * p.scale);
-          ctx.lineTo(-s.size * 0.5 * p.scale, 0);
+          ctx.lineTo(-s.size * 0.55 * p.scale, 0);
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
@@ -344,7 +472,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
 
         // Apply shattering kinematics if active
         if (ss.triggered) {
-          const t = ss.progress * 18;
+          const t = ss.progress * 22;
           v1.x += f.vx * t;
           v1.y += f.vy * t;
           v1.z += f.vz * t;
@@ -354,21 +482,19 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
           v3.x += f.vx * t;
           v3.y += f.vy * t;
           v3.z += f.vz * t;
-          f.alpha = Math.max(0, 0.9 - ss.progress * 1.1);
+          f.alpha = Math.max(0, 0.95 - ss.progress * 1.15);
         }
 
         const p1 = project(v1.x, v1.y, v1.z);
         const p2 = project(v2.x, v2.y, v2.z);
         const p3 = project(v3.x, v3.y, v3.z);
 
-        // Calculate 2D Screen Normal for Face Culling & Lighting
         const edge1X = p2.px - p1.px;
         const edge1Y = p2.py - p1.py;
         const edge2X = p3.px - p1.px;
         const edge2Y = p3.py - p1.py;
         const normalZ = edge1X * edge2Y - edge1Y * edge2X;
 
-        // Specular highlight relative to mouse light position
         const centerPX = (p1.px + p2.px + p3.px) / 3;
         const centerPY = (p1.py + p2.py + p3.py) / 3;
         const lightDist = Math.hypot(centerPX - (cx + ms.lightX * 160), centerPY - (cy + ms.lightY * 160));
@@ -392,7 +518,6 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
       projectedFacets.forEach((f) => {
         if (f.alpha <= 0.01) return;
 
-        // Front-facing vs back-facing transparency
         const isFacingFront = f.normalZ > 0;
         const baseAlpha = isFacingFront ? f.alpha : f.alpha * 0.35;
 
@@ -402,21 +527,24 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         ctx.lineTo(f.p3.px, f.p3.py);
         ctx.closePath();
 
-        // Shading: calculate crystalline tone
-        const brightness = Math.min(255, Math.floor(180 + f.lightIntensity * 75));
-        const fillAlpha = Math.min(0.85, baseAlpha * (0.2 + f.lightIntensity * 0.4));
+        // Shading: calculate crystalline tone in theme color
+        const shadeFactor = 0.55 + f.lightIntensity * 0.45;
+        const fillR = Math.min(255, Math.floor(r * shadeFactor));
+        const fillG = Math.min(255, Math.floor(g * shadeFactor));
+        const fillB = Math.min(255, Math.floor(b * shadeFactor));
+        const fillAlpha = Math.min(0.88, baseAlpha * (0.25 + f.lightIntensity * 0.45));
 
-        ctx.fillStyle = `rgba(${brightness}, ${brightness}, ${brightness}, ${fillAlpha})`;
+        ctx.fillStyle = `rgba(${fillR}, ${fillG}, ${fillB}, ${fillAlpha})`;
         ctx.fill();
 
         // Crystalline Wireframe Edge
-        ctx.strokeStyle = `rgba(255, 255, 255, ${baseAlpha * (0.4 + f.lightIntensity * 0.5)})`;
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = `rgba(${rHigh}, ${gHigh}, ${bHigh}, ${baseAlpha * (0.45 + f.lightIntensity * 0.5)})`;
+        ctx.lineWidth = 1.3;
         ctx.stroke();
 
-        // High-reflectivity center specular flare
-        if (f.lightIntensity > 0.75 && isFacingFront) {
-          ctx.fillStyle = `rgba(255, 255, 255, ${(f.lightIntensity - 0.75) * 1.5 * baseAlpha})`;
+        // Center specular flare
+        if (f.lightIntensity > 0.72 && isFacingFront) {
+          ctx.fillStyle = `rgba(${rHigh}, ${gHigh}, ${bHigh}, ${(f.lightIntensity - 0.72) * 1.6 * baseAlpha})`;
           ctx.fill();
         }
       });
@@ -427,39 +555,60 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         ctx.save();
         ctx.translate(centerP.px, centerP.py);
         ctx.scale(centerP.scale, centerP.scale);
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = `rgba(${rHigh}, ${gHigh}, ${bHigh}, 0.85)`;
+        ctx.lineWidth = 1.6;
+
         ctx.beginPath();
         ctx.arc(0, 0, 16, 0, Math.PI * 2);
         ctx.stroke();
 
-        ctx.beginPath();
-        ctx.moveTo(0, -10);
-        ctx.lineTo(0, 10);
-        ctx.moveTo(-10, 0);
-        ctx.lineTo(10, 0);
-        ctx.stroke();
+        if (verdictTheme === 'scam') {
+          // Warning Exclamation rune
+          ctx.beginPath();
+          ctx.moveTo(0, -9);
+          ctx.lineTo(0, 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(0, 7, 1.4, 0, Math.PI * 2);
+          ctx.fillStyle = `rgb(${rHigh}, ${gHigh}, ${bHigh})`;
+          ctx.fill();
+        } else if (verdictTheme === 'legit') {
+          // Shield Checkmark rune
+          ctx.beginPath();
+          ctx.moveTo(-6, 0);
+          ctx.lineTo(-1, 5);
+          ctx.lineTo(7, -5);
+          ctx.stroke();
+        } else {
+          // Crosshair target
+          ctx.beginPath();
+          ctx.moveTo(0, -10);
+          ctx.lineTo(0, 10);
+          ctx.moveTo(-10, 0);
+          ctx.lineTo(10, 0);
+          ctx.stroke();
+        }
         ctx.restore();
       }
 
-      // 4. Defensive Impact Deflection Shockwave
+      // 4. Defensive Impact / Burst Deflection Shockwave
       const ip = impactPulseRef.current;
       if (ip.active) {
-        ip.radius += 6;
-        ip.alpha = Math.max(0, ip.alpha - 0.025);
+        ip.radius += 8;
+        ip.alpha = Math.max(0, ip.alpha - 0.022);
         const centerP = project(0, -baseScale * 0.1, baseScale * 0.42);
 
         ctx.save();
         ctx.beginPath();
         ctx.arc(centerP.px, centerP.py, ip.radius * centerP.scale, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${ip.alpha * 0.85})`;
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = ip.color.replace('0.95', `${ip.alpha}`);
+        ctx.lineWidth = 3.2;
         ctx.stroke();
 
         ctx.beginPath();
         ctx.arc(centerP.px, centerP.py, ip.radius * 0.65 * centerP.scale, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 255, 255, ${ip.alpha * 0.45})`;
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = ip.secondaryColor.replace('0.6', `${ip.alpha * 0.65}`);
+        ctx.lineWidth = 1.5;
         ctx.stroke();
         ctx.restore();
 
@@ -491,12 +640,25 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
       cancelAnimationFrame(animId);
       resizeObserver.disconnect();
     };
-  }, [onShatterComplete]);
+  }, [verdictTheme, isScanning, onShatterComplete]);
+
+  // Derived styling for HUD badges and atmospheric ambient blur
+  const isScam = verdictTheme === 'scam';
+  const isLegit = verdictTheme === 'legit';
+  const isWarning = verdictTheme === 'warning';
+
+  const glowStyle = isScam
+    ? 'bg-red-500/[0.12] blur-[80px]'
+    : isLegit
+    ? 'bg-emerald-500/[0.14] blur-[80px]'
+    : isWarning
+    ? 'bg-amber-500/[0.12] blur-[80px]'
+    : 'bg-cyan-500/[0.04] blur-[70px]';
 
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-full flex items-center justify-center select-none overflow-hidden ${className}`}
+      className={`relative w-full h-full flex items-center justify-center select-none overflow-hidden transition-all duration-500 ${className}`}
       onClick={() => {
         soundFX.click();
         onClick?.();
@@ -508,51 +670,90 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
 
       {/* Floating Tactical Specular Glare */}
       <div
-        className={`pointer-events-none absolute inset-0 rounded-full bg-white/[0.03] blur-[70px] transition-opacity duration-500 ${
-          isHovered ? 'opacity-80' : 'opacity-25'
+        className={`pointer-events-none absolute inset-0 rounded-full transition-all duration-700 ${glowStyle} ${
+          isHovered ? 'opacity-90' : 'opacity-40'
         }`}
       />
 
-      {/* Top HUD Badges */}
-      <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
-        <div className="px-2.5 py-1 rounded-full bg-black/80 border border-white/15 text-white font-mono text-[10px] flex items-center gap-1.5 shadow-lg backdrop-blur-md">
-          <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-          <span>3D AEGIS DEFENSE CORE</span>
+      {/* Top Left HUD Badge */}
+      <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none z-10">
+        <div className="px-2.5 py-1 rounded-full bg-black/85 border border-white/15 text-white font-mono text-[10px] flex items-center gap-1.5 shadow-lg backdrop-blur-md">
+          <span
+            className={`w-1.5 h-1.5 rounded-full animate-ping ${
+              isScam ? 'bg-red-400' : isLegit ? 'bg-emerald-400' : isWarning ? 'bg-amber-400' : 'bg-white'
+            }`}
+          />
+          <span>{badgeLabel || '3D AEGIS CORE'}</span>
         </div>
       </div>
 
-      <div className="absolute top-3 right-3 flex items-center gap-2 pointer-events-none">
-        <div className="px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-mono text-[10px] flex items-center gap-1.5 backdrop-blur-md">
-          <span className={`w-1.5 h-1.5 rounded-full ${shattered ? 'bg-red-400' : 'bg-emerald-400'} animate-pulse`} />
-          <span>{shattered ? 'CORE DISPERSED' : 'HARDENED SHIELD'}</span>
+      {/* Top Right State Telemetry */}
+      <div className="absolute top-3 right-3 flex items-center gap-2 pointer-events-none z-10">
+        <div
+          className={`px-2.5 py-1 rounded-full font-mono text-[10px] flex items-center gap-1.5 backdrop-blur-md border shadow-lg transition-colors ${
+            isScam
+              ? 'bg-red-950/85 border-red-500/50 text-red-300'
+              : isLegit
+              ? 'bg-emerald-950/85 border-emerald-500/50 text-emerald-300'
+              : isWarning
+              ? 'bg-amber-950/85 border-amber-500/50 text-amber-300'
+              : 'bg-black/80 border-white/15 text-neutral-300'
+          }`}
+        >
+          <span
+            className={`w-1.5 h-1.5 rounded-full animate-pulse ${
+              isScam ? 'bg-red-400' : isLegit ? 'bg-emerald-400' : isWarning ? 'bg-amber-400' : 'bg-cyan-400'
+            }`}
+          />
+          <span>
+            {isScanning
+              ? 'SCANNING...'
+              : isScam
+              ? '💥 RED BURST: SCAM DETECTED'
+              : isLegit
+              ? '🛡️ GREEN BURST: SAFE / LEGIT'
+              : isWarning
+              ? '⚠️ AMBER BURST: SUSPICIOUS'
+              : shattered
+              ? 'CORE DISPERSED'
+              : 'HARDENED SHIELD'}
+          </span>
         </div>
       </div>
 
-      {/* Bottom Interactive Trigger Dock */}
-      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 p-1.5 rounded-xl bg-black/85 border border-white/10 backdrop-blur-md shadow-2xl">
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={triggerImpact}
-            className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-mono text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
-            title="Simulate Phishing Impact Shockwave"
-          >
-            <span>⚡ Deflect Impact</span>
-          </button>
+      {/* Bottom Interactive Trigger Dock (only when showControls = true) */}
+      {showControls && (
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2 p-1.5 rounded-xl bg-black/85 border border-white/10 backdrop-blur-md shadow-2xl z-10">
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={triggerImpact}
+              className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-mono text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+              title="Trigger Deflection Shockwave"
+            >
+              <span>⚡ Deflect Shockwave</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={toggleShatter}
-            className="px-3 py-1.5 rounded-lg bg-white text-black hover:bg-neutral-200 font-mono text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 shadow-sm"
-          >
-            <span>{shattered ? '🛡️ Reconstruct Core' : '💥 Disperse / Shatter'}</span>
-          </button>
+            <button
+              type="button"
+              onClick={toggleShatter}
+              className={`px-3 py-1.5 rounded-lg font-mono text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 shadow-sm ${
+                isScam
+                  ? 'bg-red-500 hover:bg-red-400 text-white'
+                  : isLegit
+                  ? 'bg-emerald-500 hover:bg-emerald-400 text-white'
+                  : 'bg-white text-black hover:bg-neutral-200'
+              }`}
+            >
+              <span>{shattered ? '🛡️ Reconstruct Core' : '💥 Burst / Disperse'}</span>
+            </button>
+          </div>
+
+          <span className="hidden sm:inline font-mono text-[9px] text-neutral-400 px-2">
+            SPECULAR LIGHT FOLLOWS CURSOR
+          </span>
         </div>
-
-        <span className="hidden sm:inline font-mono text-[9px] text-neutral-400 px-2">
-          CURSOR TRACKS SPECULAR LIGHT
-        </span>
-      </div>
+      )}
     </div>
   );
 };

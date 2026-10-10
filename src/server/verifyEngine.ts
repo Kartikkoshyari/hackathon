@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
 export interface VerifyRequest {
   type: "link" | "qr" | "email" | "text" | "image";
@@ -25,6 +25,27 @@ function getAiClient(): GoogleGenAI | null {
   return aiClient;
 }
 
+// Helper to safely parse JSON from AI model response (handles markdown fencing)
+function parseAiJson(rawText: string): any {
+  const text = rawText.trim();
+  try {
+    return JSON.parse(text);
+  } catch {
+    // Attempt markdown block extraction
+    const match = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (match && match[1]) {
+      return JSON.parse(match[1]);
+    }
+    // Attempt to isolate first { to last }
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      return JSON.parse(text.slice(firstBrace, lastBrace + 1));
+    }
+    throw new Error("Unable to parse structured JSON from model response");
+  }
+}
+
 export async function verifyPayload(reqBody: VerifyRequest) {
   const startTime = Date.now();
   const { type, payload, extraContext } = reqBody;
@@ -39,107 +60,88 @@ export async function verifyPayload(reqBody: VerifyRequest) {
     try {
       let contentsPayload: any;
 
+      const jsonFormatInstruction = `
+Respond with valid, strict JSON ONLY (no markdown text before or after). Format:
+{
+  "verdict": "AVOID" | "SUSPICIOUS" | "SAFE",
+  "shouldAvoid": true | false,
+  "riskScore": number (0-100),
+  "riskLevel": "critical" | "warning" | "safe",
+  "headline": "concise 5-8 word threat assessment headline",
+  "primaryReason": "crisp 1-2 sentence decisive reason why user should avoid or why safe",
+  "avoidReasoning": "clear explanation of consequences or security justification",
+  "threatCategory": "e.g., Credential Harvesting Phish, Smishing, BEC, Quishing, or Verified Benign",
+  "impersonatedEntity": "targeted brand name or None / Unidentified",
+  "extractedTarget": "destination URL or contact",
+  "detailedReasons": ["specific red flag 1", "specific red flag 2", "specific red flag 3"],
+  "indicators": [
+    {"label": "Domain Authenticity", "status": "danger" | "warning" | "safe", "explanation": "brief note"},
+    {"label": "Urgency & Coercion", "status": "danger" | "warning" | "safe", "explanation": "brief note"},
+    {"label": "Payload Integrity", "status": "danger" | "warning" | "safe", "explanation": "brief note"}
+  ],
+  "recommendedActions": ["step 1", "step 2", "step 3"]
+}`;
+
       if (type === "link") {
+        const linkUrl = typeof payload === "string" ? payload : JSON.stringify(payload);
         contentsPayload = {
           parts: [
             {
-              text: `Analyze this link/URL for cybersecurity threats, phishing, lookalike domains, scams, or credential harvesting traps:
-URL: "${typeof payload === "string" ? payload : JSON.stringify(payload)}"
-${extraContext ? `Additional Context: "${extraContext}"` : ""}
+              text: `Analyze this link/URL for cybersecurity threats, phishing, lookalike domains, credential theft, or scam traps:
+URL: "${linkUrl}"
+${extraContext ? `Context: "${extraContext}"` : ""}
 
-Determine:
-1. Should the user avoid opening or clicking this link? (true/false)
-2. What is the decisive verdict? (AVOID, SUSPICIOUS, or SAFE)
-3. What is the exact reason why this should be avoided or why it is suspicious/safe?
-4. What are the specific risk indicators (e.g. domain spoofing, suspicious TLD, typosquatting, credential harvesting, brand impersonation)?
-5. What are the safe defensive actions the user should take?`,
+Determine if the user should avoid opening this link, provide risk score (0-100), and key indicators.
+${jsonFormatInstruction}`,
             },
           ],
         };
       } else if (type === "email") {
         if (typeof payload === "object" && payload.data) {
-          // Uploaded email file / screenshot
           const { mimeType = "image/png", data } = payload;
           contentsPayload = {
             parts: [
               {
-                inlineData: {
-                  mimeType,
-                  data,
-                },
+                inlineData: { mimeType, data },
               },
               {
-                text: `Perform a deep cybersecurity inspection on this uploaded email (screenshot or exported email document).
-${extraContext ? `Additional Context: "${extraContext}"` : ""}
-
-Carefully inspect:
-- Sender address, displayed name vs actual domain, SPF/DKIM spoofing indicators
-- Psychological urgency, extortion threats, fake invoices, or account suspension lures
-- Embedded links, malicious attachments, or payment redirection requests (BEC / Wire fraud)
-
-Determine:
-1. Should the user avoid opening links, downloading attachments, or replying to this email? (true/false)
-2. Decisive verdict: (AVOID, SUSPICIOUS, or SAFE)
-3. Exact primary reason why
-4. What specific indicators and red flags are present
-5. Recommended safe actions`,
+                text: `Perform deep cybersecurity inspection on this uploaded email (screenshot/export) for phishing, BEC, invoice fraud, or credential harvesting.
+${extraContext ? `Context: "${extraContext}"` : ""}
+${jsonFormatInstruction}`,
               },
             ],
           };
         } else {
-          // Pasted email text or headers
           contentsPayload = {
             parts: [
               {
-                text: `Analyze this email message content, headers, and sender details for phishing, Business Email Compromise (BEC), credential theft, and spoofing:
+                text: `Analyze this email text and headers for phishing, Business Email Compromise (BEC), credential theft, and spoofing:
 Email Content:
 """
 ${payload}
 """
-${extraContext ? `Additional Context: "${extraContext}"` : ""}
-
-Determine:
-1. Should the user avoid interacting with this email? (true/false)
-2. Decisive verdict: (AVOID, SUSPICIOUS, or SAFE)
-3. What is the exact reason why this should be avoided or why it is safe?
-4. What specific indicators are present?
-5. Safe defensive actions.`,
+${extraContext ? `Context: "${extraContext}"` : ""}
+${jsonFormatInstruction}`,
               },
             ],
           };
         }
       } else if (type === "text") {
         if (typeof payload === "object" && payload.data) {
-          // Uploaded message screenshot / text file
           const { mimeType = "image/png", data } = payload;
           contentsPayload = {
             parts: [
               {
-                inlineData: {
-                  mimeType,
-                  data,
-                },
+                inlineData: { mimeType, data },
               },
               {
-                text: `Inspect this uploaded SMS smishing, WhatsApp / Telegram message, or mobile chat screenshot:
-${extraContext ? `Additional Context: "${extraContext}"` : ""}
-
-Check for:
-- Smishing links, fake package deliveries, fake security alerts, bank fraud notices
-- Impersonation of loved ones / relatives in distress ("Hi mum / dad" scams)
-- Crypto investment scams, job offer fraud, and urgency coercive tactics
-
-Determine:
-1. Should the user avoid replying, clicking links, or calling numbers in this message? (true/false)
-2. Decisive verdict: (AVOID, SUSPICIOUS, or SAFE)
-3. Exact reason why
-4. Key risk indicators
-5. Recommended safe actions`,
+                text: `Inspect this mobile SMS/chat screenshot for smishing, lookalike links, fake verification codes, package delivery fraud, or impersonation.
+${extraContext ? `Context: "${extraContext}"` : ""}
+${jsonFormatInstruction}`,
               },
             ],
           };
         } else {
-          // Written or pasted message text
           contentsPayload = {
             parts: [
               {
@@ -148,14 +150,8 @@ Message:
 """
 ${payload}
 """
-${extraContext ? `Additional Context: "${extraContext}"` : ""}
-
-Determine:
-1. Should the user avoid interacting with or trusting this message? (true/false)
-2. Decisive verdict: (AVOID, SUSPICIOUS, or SAFE)
-3. Exact reason why
-4. Specific indicators
-5. Recommended actions`,
+${extraContext ? `Context: "${extraContext}"` : ""}
+${jsonFormatInstruction}`,
               },
             ],
           };
@@ -166,27 +162,12 @@ Determine:
           contentsPayload = {
             parts: [
               {
-                inlineData: {
-                  mimeType,
-                  data,
-                },
+                inlineData: { mimeType, data },
               },
               {
-                text: `Perform a dedicated Quishing (QR Code Phishing) threat analysis on this uploaded QR code image:
-${extraContext ? `Additional Context: "${extraContext}"` : ""}
-
-Inspect the QR code for:
-- Embedded destination URL / redirection targets
-- QR phishing (Quishing) tactics designed to bypass email gateway spam filters
-- Unauthorized payment requests or fake parking / invoice QR codes
-- Malicious mobile profile payloads or fake crypto wallet prompts
-
-Determine:
-1. Should the user avoid scanning or opening this QR code? (true/false)
-2. Decisive verdict: (AVOID, SUSPICIOUS, or SAFE)
-3. Exact reason why
-4. Specific quishing indicators
-5. Recommended actions`,
+                text: `Perform Quishing (QR Phishing) threat analysis on this uploaded QR image:
+${extraContext ? `Context: "${extraContext}"` : ""}
+${jsonFormatInstruction}`,
               },
             ],
           };
@@ -194,148 +175,57 @@ Determine:
           contentsPayload = {
             parts: [
               {
-                text: `Analyze this QR code payload or destination data for Quishing (QR Phishing) and malicious redirection:
+                text: `Analyze this QR code payload data for Quishing and malicious redirection:
 Payload: "${payload}"
-${extraContext ? `Additional Context: "${extraContext}"` : ""}
-
-Determine if the user should avoid scanning or proceeding, the primary reasons why, and safe action protocol.`,
+${extraContext ? `Context: "${extraContext}"` : ""}
+${jsonFormatInstruction}`,
               },
             ],
           };
         }
       } else {
-        // Image / screenshot analysis
         const { mimeType = "image/png", data } = payload;
         contentsPayload = {
           parts: [
             {
-              inlineData: {
-                mimeType,
-                data,
-              },
+              inlineData: { mimeType, data },
             },
             {
-              text: `Perform a comprehensive threat inspection on this uploaded image/screenshot (e.g., suspicious email, fake banking portal, extortion notice, invoice scam, suspicious alert).
-${extraContext ? `Additional Context: "${extraContext}"` : ""}
-
-Determine:
-1. Should the user avoid this communication? (true/false)
-2. Decisive verdict: (AVOID, SUSPICIOUS, or SAFE)
-3. Exact reason why
-4. Red flag indicators
-5. Recommended safe actions`,
+              text: `Perform a comprehensive threat inspection on this uploaded screenshot for scam lures, fake alerts, or extortion.
+${extraContext ? `Context: "${extraContext}"` : ""}
+${jsonFormatInstruction}`,
             },
           ],
         };
       }
 
-      let response: any;
-      let usedModel = "gemini-3.1-flash-lite";
-
-      const callGemini = async (modelName: string) => {
-        return await ai.models.generateContent({
-          model: modelName,
-          contents: contentsPayload,
-          config: {
-            systemInstruction: `You are the ScamShield Cyber Threat Verification Engine.
+      // Optimize for blazing fast latency:
+      // 1. Target gemini-3.1-flash-lite (fastest tier)
+      // 2. Set thinkingBudget: 0 to eliminate multi-second chain-of-thought overhead
+      // 3. Set maxOutputTokens: 750 to stream concise structured JSON
+      // 4. Wrap with an 8.5s timeout promise so the user never experiences long hangs
+      const generatePromise = ai.models.generateContent({
+        model: "gemini-3.1-flash-lite",
+        contents: contentsPayload,
+        config: {
+          systemInstruction: `You are the ScamShield Cyber Threat Verification Engine.
 You inspect links, QR codes, emails, messages, and screenshots to protect users from fraud, credential theft, malware, and social engineering.
 Your analysis must be direct, authoritative, and plainspoken. Always clearly answer: "Should the user avoid this or not?" and "What is the exact reason why?".`,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                verdict: {
-                  type: Type.STRING,
-                  description: "Must be one of: 'AVOID', 'SUSPICIOUS', 'SAFE'",
-                },
-                shouldAvoid: {
-                  type: Type.BOOLEAN,
-                  description: "True if user should avoid scanning, opening, or clicking; false if safe.",
-                },
-                riskScore: {
-                  type: Type.INTEGER,
-                  description: "Risk score from 0 (completely safe) to 100 (critical threat)",
-                },
-                riskLevel: {
-                  type: Type.STRING,
-                  description: "One of: 'critical', 'warning', 'safe'",
-                },
-                headline: {
-                  type: Type.STRING,
-                  description: "Short headline of the threat assessment",
-                },
-                primaryReason: {
-                  type: Type.STRING,
-                  description: "Crisp explanation of why this should be avoided or why it is safe",
-                },
-                avoidReasoning: {
-                  type: Type.STRING,
-                  description: "Detailed explanation of what could happen if interacted with (credential theft, financial loss, malware, etc.)",
-                },
-                threatCategory: {
-                  type: Type.STRING,
-                  description: "E.g., 'Quishing (QR Phishing)', 'Domain Impersonation', 'Fake Invoice Extortion', 'Account Suspension Smishing', 'Clean / Verified Entity'",
-                },
-                impersonatedEntity: {
-                  type: Type.STRING,
-                  description: "Name of the entity or brand being spoofed, or 'None / Unidentified'",
-                },
-                extractedTarget: {
-                  type: Type.STRING,
-                  description: "Extracted URL, destination domain, email, or data found inside the link/image/QR/message",
-                },
-                detailedReasons: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                  description: "List of 3 to 5 specific reasons why this should be avoided or trusted",
-                },
-                indicators: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      label: { type: Type.STRING },
-                      status: { type: Type.STRING, description: "danger, warning, or safe" },
-                      explanation: { type: Type.STRING },
-                    },
-                    required: ["label", "status", "explanation"],
-                  },
-                  description: "Specific security indicators analyzed",
-                },
-                recommendedActions: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING },
-                  description: "Immediate safe steps the user should take",
-                },
-              },
-              required: [
-                "verdict",
-                "shouldAvoid",
-                "riskScore",
-                "riskLevel",
-                "headline",
-                "primaryReason",
-                "avoidReasoning",
-                "threatCategory",
-                "detailedReasons",
-                "indicators",
-                "recommendedActions",
-              ],
-            },
+          responseMimeType: "application/json",
+          maxOutputTokens: 750,
+          thinkingConfig: {
+            thinkingBudget: 0,
           },
-        });
-      };
+        },
+      });
 
-      try {
-        usedModel = "gemini-3.1-flash-lite";
-        response = await callGemini("gemini-3.1-flash-lite");
-      } catch {
-        usedModel = "gemini-3.8-flash";
-        response = await callGemini("gemini-3.8-flash");
-      }
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("AI verification engine timeout after 8500ms")), 8500)
+      );
 
+      const response = await Promise.race([generatePromise, timeoutPromise]);
       const responseText = response.text?.trim() || "{}";
-      const parsed = JSON.parse(responseText);
+      const parsed = parseAiJson(responseText);
 
       const rawVerdict = String(parsed.verdict || "").toUpperCase();
       const isAvoid =
@@ -381,7 +271,7 @@ Your analysis must be direct, authoritative, and plainspoken. Always clearly ans
       return {
         success: true,
         source: "google-ai-studio",
-        model: usedModel,
+        model: "gemini-3.1-flash-lite",
         latencyMs: Date.now() - startTime,
         ...parsed,
         verdict: normalizedVerdict,
@@ -390,11 +280,11 @@ Your analysis must be direct, authoritative, and plainspoken. Always clearly ans
         indicators: normalizedIndicators,
       };
     } catch (err: any) {
-      console.error("Gemini API verification error:", err?.message || err);
+      console.warn("Gemini API verification note (falling back to instant heuristic engine):", err?.message || err);
     }
   }
 
-  // Fallback heuristic intelligence builder
+  // Fallback instant heuristic intelligence builder
   const fallbackResult = generateHeuristicVerification(type, payload, extraContext);
   return {
     success: true,
@@ -405,14 +295,14 @@ Your analysis must be direct, authoritative, and plainspoken. Always clearly ans
   };
 }
 
-function generateHeuristicVerification(type: string, payload: any, extraContext?: string) {
+export function generateHeuristicVerification(type: string, payload: any, extraContext?: string) {
   const contentStr = typeof payload === "string" ? payload.toLowerCase() : JSON.stringify(payload).toLowerCase();
   const fullText = `${contentStr} ${extraContext ? extraContext.toLowerCase() : ""}`;
 
   let shouldAvoid = false;
   let riskScore = 15;
-  let verdict = "SAFE";
-  let riskLevel = "safe";
+  let verdict: "AVOID" | "SUSPICIOUS" | "SAFE" = "SAFE";
+  let riskLevel: "safe" | "warning" | "critical" = "safe";
   let headline = "No Malicious Threat Signatures Detected";
   let threatCategory = "Benign Communication";
   let impersonatedEntity = "None / Unidentified";

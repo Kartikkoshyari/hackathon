@@ -1,7 +1,8 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { verifyPayload } from "./src/server/verifyEngine";
+import { verifyPayload } from "./src/server/verifyEngine.ts";
+import { processChatRequest } from "./src/server/chatEngine.ts";
 
 const app = express();
 const PORT = 3000;
@@ -41,6 +42,27 @@ app.post("/api/verify", async (req, res) => {
   } catch (err: any) {
     console.error("Verification endpoint error:", err);
     return res.status(500).json({ error: err?.message || "Internal server error" });
+  }
+});
+
+// Gemini Multi-Turn Chat API with Google Search Grounding & Persona System Instructions
+app.post("/api/chat", async (req, res) => {
+  try {
+    const { messages, model, useSearch, rolePersona } = req.body;
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "Messages array is required." });
+    }
+
+    const result = await processChatRequest({
+      messages,
+      model,
+      useSearch,
+      rolePersona,
+    });
+    return res.json(result);
+  } catch (err: any) {
+    console.error("Chat endpoint error:", err);
+    return res.status(500).json({ error: err?.message || "Failed to process chat query" });
   }
 });
 

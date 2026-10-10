@@ -526,7 +526,7 @@ export const CyberGlobe3D: React.FC<{
                   {activePin.label} <span className="text-neutral-400 font-normal text-[11px]">— {activePin.threatType}</span>
                 </span>
                 <span className="font-mono text-[9px] text-neutral-400">
-                  RISK SCORE: <strong className="text-red-400">{activePin.risk}%</strong> | LATENCY: 0.4ms
+                  RISK SCORE: <strong className="text-red-400">{activePin.risk}%</strong> | REAL-TIME WIRE SPEED
                 </span>
               </div>
             </div>
