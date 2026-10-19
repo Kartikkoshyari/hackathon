@@ -29,7 +29,7 @@ interface ChatViewProps {
   initialQuery?: string;
 }
 
-type ModelOption = 'gemini-3.5-flash' | 'gemini-3.1-flash-lite' | 'gemini-3.1-pro-preview';
+type ModelOption = 'gemini-3.8-flash' | 'gemini-3.1-flash-lite';
 type PersonaOption = 'threat_hunter' | 'incident_responder' | 'cyber_advisor';
 
 const PERSONAS: {
@@ -74,10 +74,10 @@ const INITIAL_MESSAGES: Record<PersonaOption, ChatMessageItem[]> = {
       text: `**ScamShield Threat Hunter Online.**
 I analyze active adversary campaigns, unmask lookalike domains, investigate phishing infrastructure, and evaluate potential indicators of compromise (IoCs).
 
-*Google Search Grounding is enabled to cross-reference live threat intelligence and newly reported campaigns.* What link, message, or cyber threat would you like me to inspect?`,
+What link, message, or cyber threat would you like me to inspect?`,
       timestamp: Date.now(),
-      model: 'gemini-3.5-flash',
-      grounded: true,
+      model: 'gemini-3.1-flash-lite',
+      grounded: false,
       sources: [
         {
           uri: 'https://cisa.gov/resources-tools/all-resources-alerts',
@@ -100,7 +100,7 @@ Tell me:
 
 I will generate your step-by-step containment checklist immediately.`,
       timestamp: Date.now(),
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
     },
   ],
   cyber_advisor: [
@@ -112,7 +112,7 @@ I'm here to help you navigate modern online scams, from AI voice cloning and fak
 
 Ask me anything in plain English, and I'll break down how scammers operate and how you can stay 100% safe.`,
       timestamp: Date.now(),
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
     },
   ],
 };
@@ -140,8 +140,8 @@ const SUGGESTED_QUERIES: Record<PersonaOption, string[]> = {
 
 export const ChatView: React.FC<ChatViewProps> = ({ onNavigate, initialQuery }) => {
   const [selectedPersona, setSelectedPersona] = useState<PersonaOption>('threat_hunter');
-  const [selectedModel, setSelectedModel] = useState<ModelOption>('gemini-3.5-flash');
-  const [useSearch, setUseSearch] = useState<boolean>(true);
+  const [selectedModel, setSelectedModel] = useState<ModelOption>('gemini-3.1-flash-lite');
+  const [useSearch, setUseSearch] = useState<boolean>(false);
   const [messages, setMessages] = useState<ChatMessageItem[]>(() => INITIAL_MESSAGES.threat_hunter);
   const [inputValue, setInputValue] = useState<string>(initialQuery || '');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -285,16 +285,16 @@ export const ChatView: React.FC<ChatViewProps> = ({ onNavigate, initialQuery }) 
                 type="button"
                 onClick={() => {
                   soundFX.click();
-                  setSelectedModel('gemini-3.5-flash');
+                  setSelectedModel('gemini-3.8-flash');
                 }}
                 className={`px-2.5 py-1 rounded transition-all cursor-pointer ${
-                  selectedModel === 'gemini-3.5-flash'
+                  selectedModel === 'gemini-3.8-flash'
                     ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold'
                     : 'text-neutral-400 hover:text-white'
                 }`}
-                title="gemini-3.5-flash: Balanced reasoning and live Google Search grounding (Recommended)"
+                title="gemini-3.8-flash: Balanced reasoning and live Google Search grounding (Recommended)"
               >
-                3.5 Flash
+                3.8 Flash
               </button>
               <button
                 type="button"
@@ -310,21 +310,6 @@ export const ChatView: React.FC<ChatViewProps> = ({ onNavigate, initialQuery }) 
                 title="gemini-3.1-flash-lite: Ultra-fast low-latency processing"
               >
                 3.1 Lite
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  soundFX.click();
-                  setSelectedModel('gemini-3.1-pro-preview');
-                }}
-                className={`px-2.5 py-1 rounded transition-all cursor-pointer ${
-                  selectedModel === 'gemini-3.1-pro-preview'
-                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold'
-                    : 'text-neutral-400 hover:text-white'
-                }`}
-                title="gemini-3.1-pro-preview: Deep cognitive reasoning for complex reverse engineering"
-              >
-                3.1 Pro
               </button>
             </div>
 

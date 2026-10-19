@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavigationTab } from '../types';
 import { CyberGlobe3D } from './CyberGlobe3D';
 import { TiltCard3D } from './TiltCard3D';
+import { HomeAiCopilot } from './HomeAiCopilot';
 import { soundFX } from '../utils/soundEffects';
 import {
   ShieldCheck,
@@ -482,6 +483,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
           </div>
         </TiltCard3D>
       </section>
+
+      {/* AI CYBER COPILOT SECTION AT BOTTOM OF HOME PAGE */}
+      <HomeAiCopilot onNavigate={onNavigate} />
 
       {/* DEFENSE SPECIFICATIONS & ARCHITECTURE BENTO */}
       <section className="bg-[#0b111e] rounded-2xl p-6 md:p-8 border border-white/10 space-y-6">

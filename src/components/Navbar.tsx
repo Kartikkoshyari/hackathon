@@ -27,7 +27,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, userXp 
     { id: 'analyzer', label: 'Threat Analyzer' },
     { id: 'simulator', label: 'Attack Simulator' },
     { id: 'dashboard', label: 'Threat Intel' },
-    { id: 'chat', label: 'AI Cyber Copilot' },
   ];
 
   const handleNavClick = (tab: NavigationTab) => {

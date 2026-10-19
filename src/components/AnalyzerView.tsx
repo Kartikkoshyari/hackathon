@@ -536,11 +536,11 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
 
     soundFX.shieldCharge();
 
-    // AbortController with 9-second hard client deadline to prevent any UI freeze
+    // AbortController with 25-second client deadline for deep AI analysis and large payloads
     const abortCtrl = new AbortController();
     const abortTimer = setTimeout(() => {
       abortCtrl.abort();
-    }, 9000);
+    }, 25000);
 
     try {
       const response = await fetch('/api/verify', {

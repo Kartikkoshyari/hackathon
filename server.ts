@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
@@ -5,7 +6,7 @@ import { verifyPayload } from "./src/server/verifyEngine.ts";
 import { processChatRequest } from "./src/server/chatEngine.ts";
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Enable JSON body parsing with enough capacity for image uploads (base64)
 app.use(express.json({ limit: "20mb" }));

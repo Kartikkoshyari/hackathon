@@ -6,11 +6,10 @@ import { HomeView } from './components/HomeView';
 import { AnalyzerView } from './components/AnalyzerView';
 import { SimulatorView } from './components/SimulatorView';
 import { DashboardView } from './components/DashboardView';
-import { ChatView } from './components/ChatView';
 import { LandingCoverView } from './components/LandingCoverView';
 import { INITIAL_RECENT_MESSAGES } from './data/mockTelemetry';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageSquareCode, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { soundFX } from './utils/soundEffects';
 
 export default function App() {
@@ -24,6 +23,21 @@ export default function App() {
   });
 
   const handleNavigate = (tab: NavigationTab, payload?: string) => {
+    if (tab === 'chat') {
+      setCurrentTab('home');
+      setTimeout(() => {
+        const el = document.getElementById('ai-copilot-section');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          const input = el.querySelector('input');
+          if (payload && input) {
+            input.value = payload;
+          }
+          input?.focus();
+        }
+      }, 120);
+      return;
+    }
     if (payload) {
       setPendingPayload(payload);
     }
@@ -133,40 +147,31 @@ export default function App() {
                   simulatorStats={simulatorStats}
                 />
               )}
-
-              {currentTab === 'chat' && (
-                <ChatView
-                  onNavigate={handleNavigate}
-                  initialQuery={pendingPayload || undefined}
-                />
-              )}
             </motion.div>
           </AnimatePresence>
         </div>
       </main>
 
-      {/* Floating Tactical AI Copilot Launcher */}
-      {currentTab !== 'chat' && (
-        <aside aria-label="Tactical Assistant" className="fixed bottom-6 right-6 z-40">
-          <button
-            type="button"
-            onClick={() => {
-              soundFX.click();
-              handleNavigate('chat');
-            }}
-            className="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#0e1626]/90 hover:bg-[#131f36] text-white border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.35)] backdrop-blur-md transition-all cursor-pointer hover:scale-105 active:scale-95"
-            title="Launch Gemini Threat Intelligence Copilot"
-          >
-            <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-300">
-              <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '6s' }} />
-            </div>
-            <span className="font-['Space_Grotesk'] text-xs font-bold tracking-tight">
-              AI Copilot
-            </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          </button>
-        </aside>
-      )}
+      {/* Floating Tactical AI Copilot Launcher: Scrolls to Home Copilot */}
+      <aside aria-label="Tactical Assistant" className="fixed bottom-6 right-6 z-40">
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.click();
+            handleNavigate('chat');
+          }}
+          className="group flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#0e1626]/90 hover:bg-[#131f36] text-white border border-cyan-500/40 shadow-[0_0_25px_rgba(6,182,212,0.35)] backdrop-blur-md transition-all cursor-pointer hover:scale-105 active:scale-95"
+          title="Scroll to AI Cyber Copilot"
+        >
+          <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-300">
+            <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '6s' }} />
+          </div>
+          <span className="font-['Space_Grotesk'] text-xs font-bold tracking-tight">
+            AI Copilot
+          </span>
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        </button>
+      </aside>
 
       {/* Footer */}
       <Footer />

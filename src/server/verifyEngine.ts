@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 
 export interface VerifyRequest {
   type: "link" | "qr" | "email" | "text" | "image";
@@ -212,15 +212,15 @@ ${jsonFormatInstruction}`,
 You inspect links, QR codes, emails, messages, and screenshots to protect users from fraud, credential theft, malware, and social engineering.
 Your analysis must be direct, authoritative, and plainspoken. Always clearly answer: "Should the user avoid this or not?" and "What is the exact reason why?".`,
           responseMimeType: "application/json",
-          maxOutputTokens: 750,
+          maxOutputTokens: 900,
           thinkingConfig: {
-            thinkingBudget: 0,
+            thinkingLevel: ThinkingLevel.MINIMAL,
           },
         },
       });
 
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("AI verification engine timeout after 8500ms")), 8500)
+        setTimeout(() => reject(new Error("AI verification engine timeout after 25000ms")), 25000)
       );
 
       const response = await Promise.race([generatePromise, timeoutPromise]);
