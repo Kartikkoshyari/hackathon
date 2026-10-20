@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { analyzeMessage, PRESET_MESSAGES } from '../utils/heuristics';
+import { analyzeMessage, PRESET_MESSAGES, evaluatePayloadLocally } from '../utils/heuristics';
 import { AnalysisResult, NavigationTab, UploadMode, AIVerificationResult } from '../types';
 import { TiltCard3D } from './TiltCard3D';
 import { CrystallineShield3D, ShieldVerdictTheme } from './CrystallineShield3D';
@@ -619,49 +619,56 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
       setLastAnalysisDuration(durationMs);
       console.warn('Threat verification API warning, generating defensive verdict:', err);
 
-      // Construct robust fallback analysis
-      const fallbackVerdict: AIVerificationResult = {
-        verdict: 'AVOID',
-        shouldAvoid: true,
-        riskScore: 89,
-        riskLevel: 'critical',
-        headline: 'Potential Malicious Vector Detected by Threat Engine',
-        primaryReason:
-          'Payload exhibits common deception indicators including unverified domains, urgency triggers, or request for sensitive credentials.',
-        avoidReasoning:
-          'Do not open, execute, or enter confidential info until verified through an authoritative secondary communication channel.',
-        threatCategory: 'Deceptive Social Engineering Trap',
-        detailedReasons: [
-          'Unrecognized origin or destination domain pattern.',
-          'Contains high-pressure psychological manipulation cues.',
-          'Bypasses official authentication safeguards.',
-        ],
-        indicators: [
-          { label: 'Origin Trust', status: 'danger', explanation: 'Unable to verify cryptographic signature or domain ownership.' },
-          { label: 'Behavioral Risk', status: 'warning', explanation: 'Prompts immediate action under fabricated consequence.' },
-          { label: 'Channel Integrity', status: 'danger', explanation: 'Channel lacks out-of-band identity verification.' },
-        ],
-        recommendedActions: [
-          'Avoid opening links or following instructions.',
-          'Verify requests via independent phone contact with the official entity.',
-          'Flag and quarantine the communication.',
-        ],
-        source: 'local-threat-engine',
-        latencyMs: durationMs,
-      };
+      // Intelligent local evaluation engine fallback (ensures accurate verdicts on Netlify or offline)
+      const fallbackVerdict = evaluatePayloadLocally(verifyType, verifyPayload, extraContext);
+      fallbackVerdict.latencyMs = durationMs;
       setAiResult(fallbackVerdict);
-      setShieldTheme('scam');
+
+      const isScamVerdict = Boolean(
+        fallbackVerdict.shouldAvoid ||
+        fallbackVerdict.riskScore >= 60 ||
+        fallbackVerdict.riskLevel === 'critical' ||
+        String(fallbackVerdict.verdict || '').toUpperCase().includes('AVOID')
+      );
+      const isLegitVerdict = Boolean(
+        !fallbackVerdict.shouldAvoid &&
+        fallbackVerdict.riskScore < 45 &&
+        fallbackVerdict.riskLevel === 'safe' &&
+        String(fallbackVerdict.verdict || '').toUpperCase().includes('SAFE')
+      );
+
+      const targetTheme: ShieldVerdictTheme = isScamVerdict
+        ? 'scam'
+        : isLegitVerdict
+        ? 'legit'
+        : 'warning';
+
+      setShieldTheme(targetTheme);
       setShieldBurstTrigger(Date.now());
-      setIsShieldShattered(true);
+      setIsShieldShattered(isScamVerdict);
 
       setBurstActivation({
         id: Date.now(),
-        type: 'scam',
-        title: 'CRYSTAL AEGIS // SCAM BREACH DEFLECTED',
-        subtitle: 'Defensive heuristic override triggered • Malicious trap quarantined',
+        type: targetTheme,
+        title: isScamVerdict
+          ? 'CRYSTAL AEGIS // SCAM BREACH DEFLECTED'
+          : isLegitVerdict
+          ? 'CRYSTAL AEGIS // VERIFIED SAFE DEFENSE'
+          : 'CRYSTAL AEGIS // ELEVATED THREAT WARNING',
+        subtitle: isScamVerdict
+          ? 'High-risk deception vector intercepted • Protective countermeasures engaged'
+          : isLegitVerdict
+          ? 'Authoritative security signatures verified • Safe to proceed'
+          : 'Anomalous indicators detected • Exercise heightened scrutiny',
       });
 
-      soundFX.scamThreatBurst();
+      if (isScamVerdict) {
+        soundFX.scamThreatBurst();
+      } else if (isLegitVerdict) {
+        soundFX.legitShieldBurst();
+      } else {
+        soundFX.warningBurst();
+      }
     } finally {
       setIsVerifying(false);
     }

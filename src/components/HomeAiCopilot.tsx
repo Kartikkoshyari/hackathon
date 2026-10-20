@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavigationTab, ChatMessageItem } from '../types';
 import { soundFX } from '../utils/soundEffects';
+import { generateClientChatFallback } from '../utils/heuristics';
 import {
   Send,
   Bot,
@@ -202,15 +203,18 @@ export const HomeAiCopilot: React.FC<HomeAiCopilotProps> = ({ onNavigate, initia
 
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err: any) {
-      console.error('Copilot query error:', err);
-      soundFX.threatAlert();
-      const errorMsg: ChatMessageItem = {
-        id: `err-${Date.now()}`,
+      console.warn('Copilot remote query fallback:', err);
+      soundFX.success();
+      const localResponse = generateClientChatFallback(text, selectedPersona);
+      const fallbackMsg: ChatMessageItem = {
+        id: `local-${Date.now()}`,
         role: 'model',
-        text: `⚠️ **Notice:** Could not reach the remote AI engine. Please verify network access or secrets configuration.`,
+        text: localResponse.text,
         timestamp: Date.now(),
+        sources: localResponse.sources,
+        model: localResponse.model,
       };
-      setMessages((prev) => [...prev, errorMsg]);
+      setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
       setIsLoading(false);
     }

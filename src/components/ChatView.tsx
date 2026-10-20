@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NavigationTab, ChatMessageItem, ChatSource } from '../types';
 import { soundFX } from '../utils/soundEffects';
+import { generateClientChatFallback } from '../utils/heuristics';
 import {
   Send,
   Bot,
@@ -232,16 +233,18 @@ export const ChatView: React.FC<ChatViewProps> = ({ onNavigate, initialQuery }) 
 
       setMessages((prev) => [...prev, aiMsg]);
     } catch (err: any) {
-      console.error('Chat query failed:', err);
-      soundFX.threatAlert();
-      const errorMsg: ChatMessageItem = {
-        id: `err-${Date.now()}`,
+      console.warn('Chat query remote fallback:', err);
+      soundFX.success();
+      const localResponse = generateClientChatFallback(text, selectedPersona);
+      const fallbackMsg: ChatMessageItem = {
+        id: `local-${Date.now()}`,
         role: 'model',
-        text: `⚠️ **Defensive System Notice:** Unable to reach remote Gemini engine. Please check your network connection or verify your API key in **Settings > Secrets**.`,
+        text: localResponse.text,
         timestamp: Date.now(),
-        model: selectedModel,
+        sources: localResponse.sources,
+        model: localResponse.model,
       };
-      setMessages((prev) => [...prev, errorMsg]);
+      setMessages((prev) => [...prev, fallbackMsg]);
     } finally {
       setIsLoading(false);
     }
