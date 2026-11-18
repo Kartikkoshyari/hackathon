@@ -700,7 +700,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 burstActivation.type === 'scam'
                   ? 'shadow-[inset_0_0_140px_rgba(239,68,68,0.6),0_0_90px_rgba(239,68,68,0.45)]'
                   : burstActivation.type === 'legit'
-                  ? 'shadow-[inset_0_0_140px_rgba(16,185,129,0.6),0_0_90px_rgba(16,185,129,0.45)]'
+                  ? 'shadow-[inset_0_0_140px_rgba(59,130,246,0.6),0_0_90px_rgba(59,130,246,0.45)]'
                   : 'shadow-[inset_0_0_120px_rgba(245,158,11,0.5),0_0_70px_rgba(245,158,11,0.35)]'
               }`}
               style={{
@@ -708,7 +708,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   burstActivation.type === 'scam'
                     ? 'radial-gradient(circle at 50% 32%, rgba(239, 68, 68, 0.38) 0%, rgba(185, 28, 28, 0.12) 50%, transparent 80%)'
                     : burstActivation.type === 'legit'
-                    ? 'radial-gradient(circle at 50% 32%, rgba(16, 185, 129, 0.38) 0%, rgba(5, 150, 105, 0.12) 50%, transparent 80%)'
+                    ? 'radial-gradient(circle at 50% 32%, rgba(59, 130, 246, 0.38) 0%, rgba(37, 99, 235, 0.12) 50%, transparent 80%)'
                     : 'radial-gradient(circle at 50% 32%, rgba(245, 158, 11, 0.32) 0%, rgba(180, 83, 9, 0.1) 50%, transparent 80%)',
               }}
             />
@@ -722,7 +722,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 burstActivation.type === 'scam'
                   ? 'border-red-500 shadow-[0_0_40px_rgba(239,68,68,0.85)]'
                   : burstActivation.type === 'legit'
-                  ? 'border-emerald-400 shadow-[0_0_40px_rgba(16,185,129,0.85)]'
+                  ? 'border-blue-400 shadow-[0_0_40px_rgba(59,130,246,0.85)]'
                   : 'border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.85)]'
               }`}
             />
@@ -736,7 +736,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 burstActivation.type === 'scam'
                   ? 'border-red-400 shadow-[0_0_25px_rgba(239,68,68,0.65)]'
                   : burstActivation.type === 'legit'
-                  ? 'border-emerald-300 shadow-[0_0_25px_rgba(16,185,129,0.65)]'
+                  ? 'border-blue-300 shadow-[0_0_25px_rgba(59,130,246,0.65)]'
                   : 'border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.65)]'
               }`}
             />
@@ -764,7 +764,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                       burstActivation.type === 'scam'
                         ? 'bg-red-400 shadow-[0_0_15px_#ef4444]'
                         : burstActivation.type === 'legit'
-                        ? 'bg-emerald-400 shadow-[0_0_15px_#10b981]'
+                        ? 'bg-blue-400 shadow-[0_0_15px_#3b82f6]'
                         : 'bg-amber-400 shadow-[0_0_15px_#f59e0b]'
                     }`}
                     style={{
@@ -792,7 +792,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 burstActivation.type === 'scam'
                   ? 'bg-black/90 border-red-500/60 shadow-[0_0_55px_rgba(239,68,68,0.5)]'
                   : burstActivation.type === 'legit'
-                  ? 'bg-black/90 border-emerald-500/60 shadow-[0_0_55px_rgba(16,185,129,0.5)]'
+                  ? 'bg-black/90 border-blue-500/60 shadow-[0_0_55px_rgba(59,130,246,0.5)]'
                   : 'bg-black/90 border-amber-500/60 shadow-[0_0_45px_rgba(245,158,11,0.45)]'
               }`}
             >
@@ -802,7 +802,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   burstActivation.type === 'scam'
                     ? 'border-red-400'
                     : burstActivation.type === 'legit'
-                    ? 'border-emerald-400'
+                    ? 'border-blue-400'
                     : 'border-amber-400'
                 }`}
               />
@@ -811,7 +811,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   burstActivation.type === 'scam'
                     ? 'border-red-400'
                     : burstActivation.type === 'legit'
-                    ? 'border-emerald-400'
+                    ? 'border-blue-400'
                     : 'border-amber-400'
                 }`}
               />
@@ -820,7 +820,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   burstActivation.type === 'scam'
                     ? 'border-red-400'
                     : burstActivation.type === 'legit'
-                    ? 'border-emerald-400'
+                    ? 'border-blue-400'
                     : 'border-amber-400'
                 }`}
               />
@@ -829,7 +829,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   burstActivation.type === 'scam'
                     ? 'border-red-400'
                     : burstActivation.type === 'legit'
-                    ? 'border-emerald-400'
+                    ? 'border-blue-400'
                     : 'border-amber-400'
                 }`}
               />
@@ -839,7 +839,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 {burstActivation.type === 'scam' ? (
                   <ShieldAlert className="w-5 h-5 text-red-400 animate-pulse" />
                 ) : burstActivation.type === 'legit' ? (
-                  <ShieldCheck className="w-5 h-5 text-emerald-400 animate-pulse" />
+                  <ShieldCheck className="w-5 h-5 text-blue-400 animate-pulse" />
                 ) : (
                   <AlertTriangle className="w-5 h-5 text-amber-400 animate-pulse" />
                 )}
@@ -848,14 +848,14 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                     burstActivation.type === 'scam'
                       ? 'text-red-400'
                       : burstActivation.type === 'legit'
-                      ? 'text-emerald-400'
+                      ? 'text-blue-400'
                       : 'text-amber-400'
                   }`}
                 >
                   {burstActivation.type === 'scam'
                     ? '🔴 RED BURST ACTIVATED'
                     : burstActivation.type === 'legit'
-                    ? '🟢 GREEN BURST ACTIVATED'
+                    ? '🔵 BLUE BURST ACTIVATED'
                     : '🟡 AMBER BURST ACTIVATED'}
                 </span>
               </div>
@@ -866,7 +866,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   burstActivation.type === 'scam'
                     ? 'text-white drop-shadow-[0_0_20px_rgba(239,68,68,0.8)]'
                     : burstActivation.type === 'legit'
-                    ? 'text-white drop-shadow-[0_0_20px_rgba(16,185,129,0.8)]'
+                    ? 'text-white drop-shadow-[0_0_20px_rgba(59,130,246,0.8)]'
                     : 'text-white drop-shadow-[0_0_15px_rgba(245,158,11,0.8)]'
                 }`}
               >
@@ -894,7 +894,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                       burstActivation.type === 'scam'
                         ? 'bg-red-400'
                         : burstActivation.type === 'legit'
-                        ? 'bg-emerald-400'
+                        ? 'bg-blue-400'
                         : 'bg-amber-400'
                     }`}
                   />
@@ -938,8 +938,8 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
             </div>
 
             <div className="flex items-center gap-2 self-start md:self-auto bg-[#111827] px-3.5 py-2 rounded-lg border border-white/8 shadow-sm">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#10B981] shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              <span className="font-['JetBrains_Mono'] text-[11px] text-[#10B981] font-semibold tracking-wide">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#3B82F6] shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+              <span className="font-['JetBrains_Mono'] text-[11px] text-[#60A5FA] font-semibold tracking-wide">
                 THREAT DEFENSE
               </span>
               <span className="text-[#869397] text-xs">|</span>
@@ -1529,18 +1529,18 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
               >
                 {isVerifying ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-cyan-300" />
+                    <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
                     <span>Analyzing Threat Vector...</span>
-                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-black/40 text-cyan-300">
+                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-blue-600 text-white font-semibold">
                       {(elapsedScanTime / 1000).toFixed(1)}s
                     </span>
                   </>
                 ) : (
                   <>
-                    <Zap className="w-4 h-4 fill-current text-cyan-300" />
+                    <Zap className="w-4 h-4 fill-current text-blue-600" />
                     <span>Verify with Threat Defense Engine</span>
                     {lastAnalysisDuration !== null && (
-                      <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-black/30 text-emerald-400 font-normal">
+                      <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-blue-600 text-white font-semibold">
                         ⚡ {(lastAnalysisDuration / 1000).toFixed(2)}s
                       </span>
                     )}
@@ -1549,7 +1549,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
               </button>
 
               <div className="flex items-center justify-between px-1 text-[#64748B] font-['JetBrains_Mono'] text-xs">
-                <div className="flex items-center gap-1.5 text-[#10B981]">
+                <div className="flex items-center gap-1.5 text-[#60A5FA]">
                   <Lock className="w-3.5 h-3.5" />
                   <span>Zero-Telemetry Guarantee</span>
                 </div>
@@ -1567,7 +1567,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
               <span className="font-['Space_Grotesk'] text-xs uppercase tracking-wider text-[#64748B] font-semibold">
                 Threat Defense Specs
               </span>
-              <span className="px-2 py-0.5 rounded bg-[#1E293B] text-[#10B981] font-['JetBrains_Mono'] text-[10px] font-semibold">
+              <span className="px-2 py-0.5 rounded bg-[#1E293B] text-[#60A5FA] font-['JetBrains_Mono'] text-[10px] font-semibold">
                 CORE v4.8 ACTIVE
               </span>
             </div>
@@ -1585,7 +1585,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
               shieldTheme === 'scam'
                 ? 'bg-gradient-to-b from-[#1a080d] via-[#100609] to-[#070305] border-red-500/50 shadow-[0_0_40px_rgba(239,68,68,0.3)]'
                 : shieldTheme === 'legit'
-                ? 'bg-gradient-to-b from-[#061812] via-[#04100c] to-[#030806] border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.3)]'
+                ? 'bg-gradient-to-b from-[#061020] via-[#040a16] to-[#03060d] border-blue-500/50 shadow-[0_0_40px_rgba(59,130,246,0.3)]'
                 : shieldTheme === 'warning'
                 ? 'bg-gradient-to-b from-[#191106] via-[#110c04] to-[#080502] border-amber-500/50 shadow-[0_0_35px_rgba(245,158,11,0.25)]'
                 : 'bg-gradient-to-b from-[#0b101c] via-[#070b14] to-[#04060b] border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)]'
@@ -1603,7 +1603,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   shieldTheme === 'scam'
                     ? '3D AEGIS: RED BURST DEFLECTION'
                     : shieldTheme === 'legit'
-                    ? '3D AEGIS: GREEN BURST HARDENED'
+                    ? '3D AEGIS: BLUE BURST HARDENED'
                     : shieldTheme === 'warning'
                     ? '3D AEGIS: AMBER CAUTION PULSE'
                     : '3D AEGIS THREAT MONITOR'
@@ -1629,7 +1629,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
             className={`rounded-xl p-5 border shadow-xl flex flex-col gap-4 relative overflow-hidden transition-all card-3d-bevel ${
               isAvoid
                 ? 'bg-[#181014] border-[#EF4444]/40 shadow-[0_0_25px_rgba(239,68,68,0.15)]'
-                : 'bg-[#0a1815] border-[#10B981]/40 shadow-[0_0_25px_rgba(16,185,129,0.15)]'
+                : 'bg-[#0a1222] border-[#3B82F6]/40 shadow-[0_0_25px_rgba(59,130,246,0.18)]'
             }`}
           >
             {/* Top Bar: Source badge and score */}
@@ -1639,11 +1639,11 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                   className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-['JetBrains_Mono'] font-bold uppercase tracking-wider ${
                     isAvoid
                       ? 'bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/40'
-                      : 'bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/40'
+                      : 'bg-[#3B82F6]/20 text-[#60A5FA] border border-[#3B82F6]/40'
                   }`}
                 >
                   <span
-                    className={`w-2 h-2 rounded-full animate-ping ${isAvoid ? 'bg-[#EF4444]' : 'bg-[#10B981]'}`}
+                    className={`w-2 h-2 rounded-full animate-ping ${isAvoid ? 'bg-[#EF4444]' : 'bg-[#3B82F6]'}`}
                   />
                   VERDICT: {verdictText}
                 </span>
@@ -1665,7 +1665,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 <span className="font-['JetBrains_Mono'] text-xs text-[#64748B]">RISK INDEX:</span>
                 <span
                   className={`font-['Space_Grotesk'] text-xl font-bold ${
-                    isAvoid ? 'text-[#EF4444]' : 'text-[#10B981]'
+                    isAvoid ? 'text-[#EF4444]' : 'text-[#60A5FA]'
                   }`}
                 >
                   {riskScore}/100
@@ -1677,7 +1677,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
             <div className="flex items-start gap-4">
               <div
                 className={`p-3 rounded-xl shrink-0 ${
-                  isAvoid ? 'bg-[#EF4444]/20 text-[#EF4444]' : 'bg-[#10B981]/20 text-[#10B981]'
+                  isAvoid ? 'bg-[#EF4444]/20 text-[#EF4444]' : 'bg-[#3B82F6]/20 text-[#60A5FA]'
                 }`}
               >
                 {isAvoid ? <XCircle className="w-8 h-8" /> : <CheckCircle2 className="w-8 h-8" />}
@@ -1687,7 +1687,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 <div className="flex items-center gap-2">
                   <span
                     className={`font-['Space_Grotesk'] text-lg md:text-xl font-bold ${
-                      isAvoid ? 'text-[#EF4444]' : 'text-[#10B981]'
+                      isAvoid ? 'text-[#EF4444]' : 'text-[#60A5FA]'
                     }`}
                   >
                     {isAvoid ? 'SHOULD AVOID (DO NOT PROCEED)' : 'SAFE TO PROCEED (VERIFIED)'}
@@ -1762,7 +1762,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                             ? 'bg-[#EF4444]/20 text-[#EF4444]'
                             : ind.status === 'warning'
                             ? 'bg-[#F59E0B]/20 text-[#F59E0B]'
-                            : 'bg-[#10B981]/20 text-[#10B981]'
+                            : 'bg-[#3B82F6]/20 text-[#60A5FA]'
                         }`}
                       >
                         {ind.status}
@@ -1798,12 +1798,12 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
           <div className="bg-[#1c2028]/90 rounded-xl p-4 md:p-5 border border-white/8 relative overflow-hidden flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-[#10B981]" />
+                <ShieldCheck className="w-5 h-5 text-[#60A5FA]" />
                 <h3 className="font-['Space_Grotesk'] text-base md:text-lg font-bold text-[#F8FAFC]">
                   Safe Action Protocol: What To Do
                 </h3>
               </div>
-              <span className="px-2 py-0.5 rounded bg-[#10B981]/10 text-[#10B981] font-['JetBrains_Mono'] text-[11px] border border-[#10B981]/30 font-semibold">
+              <span className="px-2 py-0.5 rounded bg-[#3B82F6]/10 text-[#60A5FA] font-['JetBrains_Mono'] text-[11px] border border-[#3B82F6]/30 font-semibold">
                 RECOMMENDED STEPS
               </span>
             </div>
@@ -1816,7 +1816,7 @@ export const AnalyzerView: React.FC<AnalyzerViewProps> = ({
                 'Quarantine and block sender communications.',
               ]).map((act, aIdx) => (
                 <div key={aIdx} className="flex items-start gap-2.5 p-3 rounded bg-[#06090E]/60 border border-white/5">
-                  <div className="w-6 h-6 rounded bg-[#10B981]/20 text-[#10B981] font-['JetBrains_Mono'] text-xs flex items-center justify-center shrink-0 font-bold">
+                  <div className="w-6 h-6 rounded bg-[#3B82F6]/20 text-[#60A5FA] font-['JetBrains_Mono'] text-xs flex items-center justify-center shrink-0 font-bold">
                     0{aIdx + 1}
                   </div>
                   <div className="flex flex-col">

@@ -297,7 +297,7 @@ const BASE_NODES: ThreatNode[] = [
     target: 'https://cloud.google.com/security',
     tactic: 'Cryptographic Authenticity',
     radius: 11,
-    color: '#10b981',
+    color: '#3b82f6',
     details: 'Official, certificate-pinned Google Cloud documentation and security advisory portal.',
   },
   {
@@ -311,7 +311,7 @@ const BASE_NODES: ThreatNode[] = [
     target: 'https://chase.com',
     tactic: 'EV SSL Validated',
     radius: 11,
-    color: '#10b981',
+    color: '#3b82f6',
     details: 'Genuine JPMorgan Chase web portal protected by multi-factor hardware security tokens.',
   },
   {
@@ -325,7 +325,7 @@ const BASE_NODES: ThreatNode[] = [
     target: 'https://workday.com',
     tactic: 'Trusted IdP Authenticated',
     radius: 11,
-    color: '#10b981',
+    color: '#3b82f6',
     details: 'Authoritative Workday cloud application matching organization federation metadata.',
   },
   {
@@ -339,7 +339,7 @@ const BASE_NODES: ThreatNode[] = [
     target: 'https://tools.usps.com/go/TrackConfirmAction',
     tactic: 'Official .gov/.com Domain',
     radius: 10,
-    color: '#10b981',
+    color: '#3b82f6',
     details: 'Official United States Postal Service package tracking tool with no micro-charge prompts.',
   },
   {
@@ -353,7 +353,7 @@ const BASE_NODES: ThreatNode[] = [
     target: 'https://github.com/advisories',
     tactic: 'Verified Community Database',
     radius: 10,
-    color: '#10b981',
+    color: '#3b82f6',
     details: 'Authoritative Open Source CVE and dependency audit repository managed by GitHub.',
   },
 ];
@@ -467,7 +467,7 @@ export const ThreatNetworkMap: React.FC<ThreatNetworkMapProps> = ({
     createGlowFilter('glow-root', '#38bdf8', 5);
     createGlowFilter('glow-critical', '#ef4444', 4.5);
     createGlowFilter('glow-warning', '#f59e0b', 4);
-    createGlowFilter('glow-safe', '#10b981', 3.5);
+    createGlowFilter('glow-safe', '#3b82f6', 3.5);
 
     // Zoom container
     const g = svg.append('g').attr('class', 'network-canvas');
@@ -761,11 +761,11 @@ export const ThreatNetworkMap: React.FC<ThreatNetworkMapProps> = ({
               }}
               className={`px-2.5 py-1 rounded transition-all cursor-pointer flex items-center gap-1 ${
                 filterRisk === 'safe'
-                  ? 'bg-emerald-500 text-black font-bold shadow-[0_0_12px_rgba(16,185,129,0.5)]'
-                  : 'text-emerald-400 hover:bg-emerald-950/40'
+                  ? 'bg-blue-500 text-white font-bold shadow-[0_0_12px_rgba(59,130,246,0.5)]'
+                  : 'text-blue-400 hover:bg-blue-950/40'
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
               Safe
             </button>
           </div>
@@ -842,8 +842,8 @@ export const ThreatNetworkMap: React.FC<ThreatNetworkMapProps> = ({
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]" />
               Suspicious (6)
             </span>
-            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+            <span className="flex items-center gap-1.5 text-blue-400 font-semibold">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
               Verified (5)
             </span>
           </div>

@@ -1,4 +1,4 @@
-import { AnalysisResult, IdentifiedTactic, AnnotatedToken, Severity, RiskLevel, AIVerificationResult } from '../types';
+import type { AnalysisResult, IdentifiedTactic, AnnotatedToken, Severity, RiskLevel, AIVerificationResult } from '../types';
 
 export const PRESET_MESSAGES = {
   bank: {

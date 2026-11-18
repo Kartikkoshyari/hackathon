@@ -116,7 +116,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       );
     }
     return (
-      <span className="px-2 py-0.5 rounded-full bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 font-['JetBrains_Mono'] text-[11px] font-semibold">
+      <span className="px-2 py-0.5 rounded-full bg-[#3B82F6]/15 text-[#60A5FA] border border-[#3B82F6]/30 font-['JetBrains_Mono'] text-[11px] font-semibold">
         {label}
       </span>
     );
@@ -127,7 +127,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Toast notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#1E293B] text-[#F8FAFC] border border-[#06b6d4]/40 px-4 py-3 rounded-lg shadow-2xl font-['JetBrains_Mono'] text-xs flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
-          <CheckCircle className="w-4 h-4 text-[#10B981]" />
+          <CheckCircle className="w-4 h-4 text-[#60A5FA]" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -266,7 +266,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 strokeWidth="3.5"
               />
               <path
-                className="text-[#10B981] stroke-current"
+                className="text-[#3B82F6] stroke-current"
                 d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 fill="none"
                 strokeDasharray="18, 100"
@@ -285,7 +285,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="w-2 h-2 rounded-full bg-[#F59E0B]" /> 32% Med
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-[#10B981]" /> 18% Clean
+              <span className="w-2 h-2 rounded-full bg-[#3B82F6]" /> 18% Clean
             </span>
           </div>
         </div>
@@ -332,15 +332,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="mt-4">
             <div className="flex items-baseline gap-2">
               <span className="font-['Space_Grotesk'] text-2xl font-bold text-[#4cd7f6]">Threat Defense</span>
-              <span className="font-['JetBrains_Mono'] text-xs text-[#10B981] font-semibold">Ready</span>
+              <span className="font-['JetBrains_Mono'] text-xs text-[#60A5FA] font-semibold">Ready</span>
             </div>
             <div className="flex items-center gap-1.5 mt-1 text-[#64748B] text-xs">
               <span>Links, QR Codes, Emails &amp; Messages</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 mt-4 text-[11px] font-['JetBrains_Mono'] text-[#10B981]">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+          <div className="flex items-center gap-1.5 mt-4 text-[11px] font-['JetBrains_Mono'] text-[#60A5FA]">
+            <span className="w-2 h-2 rounded-full bg-[#3B82F6] animate-pulse" />
             <span>Multi-modal Threat Scanner Online</span>
           </div>
         </div>
@@ -467,7 +467,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 ))}
 
                 <div className="p-3.5 rounded-lg bg-[#06090E] border border-white/5">
-                  <div className="text-[#10B981] uppercase font-bold mb-1 flex items-center gap-1.5">
+                  <div className="text-[#60A5FA] uppercase font-bold mb-1 flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4" />
                     Recommended Student Action Protocol
                   </div>

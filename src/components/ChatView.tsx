@@ -470,8 +470,8 @@ export const ChatView: React.FC<ChatViewProps> = ({ onNavigate, initialQuery }) 
 
                   {/* Search Grounding Sources Accordion */}
                   {msg.sources && msg.sources.length > 0 && (
-                    <div className="w-full bg-[#070b14] p-3 rounded-xl border border-emerald-500/25 space-y-2 text-xs">
-                      <div className="flex items-center gap-1.5 text-emerald-400 font-['JetBrains_Mono'] font-bold text-[11px]">
+                    <div className="w-full bg-[#070b14] p-3 rounded-xl border border-blue-500/25 space-y-2 text-xs">
+                      <div className="flex items-center gap-1.5 text-blue-400 font-['JetBrains_Mono'] font-bold text-[11px]">
                         <Globe className="w-3.5 h-3.5" />
                         <span>Verified Google Search Sources ({msg.sources.length}):</span>
                       </div>
@@ -482,7 +482,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ onNavigate, initialQuery }) 
                             href={source.uri}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 text-neutral-300 hover:text-emerald-300 font-mono text-[10px] transition-colors"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 hover:bg-blue-500/10 border border-white/10 hover:border-blue-500/30 text-neutral-300 hover:text-blue-300 font-mono text-[10px] transition-colors"
                           >
                             <span className="truncate max-w-[200px]">{source.title || source.uri}</span>
                             <ExternalLink className="w-3 h-3 shrink-0" />
@@ -502,7 +502,7 @@ export const ChatView: React.FC<ChatViewProps> = ({ onNavigate, initialQuery }) 
                     </span>
                     {msg.model && <span>&bull; {msg.model}</span>}
                     {msg.grounded && (
-                      <span className="text-emerald-500">&bull; Grounded</span>
+                      <span className="text-blue-400">&bull; Grounded</span>
                     )}
                   </div>
                 </div>

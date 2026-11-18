@@ -18,7 +18,7 @@
   --color-tertiary: #f59e0b;
   --color-threat-critical: #ef4444;
   --color-threat-warning: #f59e0b;
-  --color-threat-safe: #10b981;
+  --color-threat-safe: #3b82f6;
   --color-terminal-cyan: #e2e8f0;
 
   --color-text-primary: #f8fafc;
@@ -64,8 +64,9 @@
   box-shadow: 0 0 20px -3px rgba(239, 68, 68, 0.4);
 }
 
+.glow-blue,
 .glow-green {
-  box-shadow: 0 0 15px -2px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 15px -2px rgba(59, 130, 246, 0.45);
 }
 
 /* High-Contrast Luxury Monochromatic Buttons (Frostbreak Aesthetic) */
@@ -112,18 +113,21 @@
   transform: translateY(2px);
 }
 
+.btn-3d-blue,
 .btn-3d-emerald {
-  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
   color: #ffffff;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid #047857;
-  box-shadow: 0 2px 0 #065f46, 0 6px 14px rgba(16, 185, 129, 0.3);
+  border-bottom: 1px solid #1d4ed8;
+  box-shadow: 0 2px 0 #1e40af, 0 6px 14px rgba(59, 130, 246, 0.35);
   transition: all 0.15s ease;
 }
+.btn-3d-blue:hover,
 .btn-3d-emerald:hover {
-  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
+  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%);
   transform: translateY(-1px);
 }
+.btn-3d-blue:active,
 .btn-3d-emerald:active {
   transform: translateY(2px);
 }

@@ -206,7 +206,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ onNavigate, onAwar
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-semibold text-[#F8FAFC]">{currentScenario.sender}</span>
                     {currentScenario.senderVerified ? (
-                      <span className="px-1.5 py-0.2 rounded bg-[#10B981]/20 text-[#10B981] text-[10px] font-['JetBrains_Mono'] font-bold">
+                      <span className="px-1.5 py-0.2 rounded bg-[#3B82F6]/20 text-[#60A5FA] text-[10px] font-['JetBrains_Mono'] font-bold">
                         VERIFIED SENDER
                       </span>
                     ) : (
@@ -296,8 +296,8 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ onNavigate, onAwar
                   onClick={() => handleMakeVerdict('legitimate')}
                   className={`flex-1 w-full py-3.5 px-4 rounded-xl font-['Space_Grotesk'] text-sm font-bold flex items-center justify-center gap-2 cursor-pointer ${
                     hasSubmitted && userVerdict === 'legitimate'
-                      ? 'btn-3d-emerald ring-2 ring-emerald-400'
-                      : 'btn-3d-emerald'
+                      ? 'btn-3d-blue ring-2 ring-blue-400'
+                      : 'btn-3d-blue'
                   } ${hasSubmitted ? 'opacity-90' : ''}`}
                 >
                   <ShieldCheck className="w-4 h-4" />
@@ -315,14 +315,14 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ onNavigate, onAwar
             <div
               className={`p-5 rounded-xl border shadow-xl animate-in fade-in zoom-in-95 ${
                 isVerdictCorrect
-                  ? 'bg-[#10B981]/10 border-[#10B981]/40 text-[#F8FAFC]'
+                  ? 'bg-[#3B82F6]/10 border-[#3B82F6]/40 text-[#F8FAFC]'
                   : 'bg-[#EF4444]/10 border-[#EF4444]/40 text-[#F8FAFC]'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   {isVerdictCorrect ? (
-                    <CheckCircle2 className="w-6 h-6 text-[#10B981]" />
+                    <CheckCircle2 className="w-6 h-6 text-[#60A5FA]" />
                   ) : (
                     <XCircle className="w-6 h-6 text-[#EF4444]" />
                   )}
@@ -407,7 +407,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({ onNavigate, onAwar
 
           {/* Safe Defensive Protocol */}
           <div className="bg-[#181c24] p-4 rounded-xl border border-white/8 text-xs space-y-1.5">
-            <span className="font-['JetBrains_Mono'] text-[#10B981] font-bold uppercase tracking-wider block">
+            <span className="font-['JetBrains_Mono'] text-[#60A5FA] font-bold uppercase tracking-wider block">
               Safe Handling Protocol
             </span>
             <p className="text-[#dfe2ee] leading-relaxed">{currentScenario.safeProtocol}</p>

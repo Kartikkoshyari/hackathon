@@ -103,21 +103,21 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
     e?.stopPropagation();
     soundFX.scan();
     const isRed = verdictTheme === 'scam';
-    const isGreen = verdictTheme === 'legit';
+    const isBlue = verdictTheme === 'legit';
     const isAmber = verdictTheme === 'warning';
 
     const pColor = isRed
       ? 'rgba(239, 68, 68, 0.95)'
-      : isGreen
-      ? 'rgba(16, 185, 129, 0.95)'
+      : isBlue
+      ? 'rgba(59, 130, 246, 0.95)'
       : isAmber
       ? 'rgba(245, 158, 11, 0.95)'
       : 'rgba(255, 255, 255, 0.95)';
 
     const sColor = isRed
       ? 'rgba(239, 68, 68, 0.5)'
-      : isGreen
-      ? 'rgba(16, 185, 129, 0.5)'
+      : isBlue
+      ? 'rgba(59, 130, 246, 0.5)'
       : isAmber
       ? 'rgba(245, 158, 11, 0.5)'
       : 'rgba(255, 255, 255, 0.5)';
@@ -172,7 +172,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
   useEffect(() => {
     if (burstTrigger !== undefined && burstTrigger > 0) {
       const isRed = verdictTheme === 'scam';
-      const isGreen = verdictTheme === 'legit';
+      const isBlue = verdictTheme === 'legit';
       const isAmber = verdictTheme === 'warning';
 
       impactPulseRef.current = {
@@ -182,15 +182,15 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         alpha: 1,
         color: isRed
           ? 'rgba(239, 68, 68, 0.95)'
-          : isGreen
-          ? 'rgba(16, 185, 129, 0.95)'
+          : isBlue
+          ? 'rgba(59, 130, 246, 0.95)'
           : isAmber
           ? 'rgba(245, 158, 11, 0.95)'
           : 'rgba(255, 255, 255, 0.95)',
         secondaryColor: isRed
           ? 'rgba(239, 68, 68, 0.6)'
-          : isGreen
-          ? 'rgba(16, 185, 129, 0.6)'
+          : isBlue
+          ? 'rgba(59, 130, 246, 0.6)'
           : isAmber
           ? 'rgba(245, 158, 11, 0.6)'
           : 'rgba(255, 255, 255, 0.6)',
@@ -201,8 +201,8 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         shatterState.current.triggered = true;
         shatterState.current.progress = 0;
         setShattered(true);
-      } else if (isGreen) {
-        // Green Legit Burst: protective harmonic reconstruction pulse!
+      } else if (isBlue) {
+        // Blue Legit Burst: protective harmonic reconstruction pulse!
         shatterState.current.triggered = false;
         shatterState.current.progress = 0;
         setShattered(false);
@@ -353,13 +353,13 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         gHigh = 160;
         bHigh = 160;
       } else if (verdictTheme === 'legit') {
-        // Green Burst (Legit / Safe)
-        r = 16;
-        g = 185;
-        b = 129;
-        rHigh = 167;
-        gHigh = 243;
-        bHigh = 208;
+        // Blue Burst (Legit / Safe)
+        r = 59;
+        g = 130;
+        b = 246;
+        rHigh = 147;
+        gHigh = 197;
+        bHigh = 253;
       } else if (verdictTheme === 'warning') {
         // Amber Burst (Suspicious)
         r = 245;
@@ -650,7 +650,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
   const glowStyle = isScam
     ? 'bg-red-500/[0.12] blur-[80px]'
     : isLegit
-    ? 'bg-emerald-500/[0.14] blur-[80px]'
+    ? 'bg-blue-500/[0.16] blur-[80px]'
     : isWarning
     ? 'bg-amber-500/[0.12] blur-[80px]'
     : 'bg-cyan-500/[0.04] blur-[70px]';
@@ -680,7 +680,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         <div className="px-2.5 py-1 rounded-full bg-black/85 border border-white/15 text-white font-mono text-[10px] flex items-center gap-1.5 shadow-lg backdrop-blur-md">
           <span
             className={`w-1.5 h-1.5 rounded-full animate-ping ${
-              isScam ? 'bg-red-400' : isLegit ? 'bg-emerald-400' : isWarning ? 'bg-amber-400' : 'bg-white'
+              isScam ? 'bg-red-400' : isLegit ? 'bg-blue-400' : isWarning ? 'bg-amber-400' : 'bg-white'
             }`}
           />
           <span>{badgeLabel || '3D AEGIS CORE'}</span>
@@ -694,7 +694,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
             isScam
               ? 'bg-red-950/85 border-red-500/50 text-red-300'
               : isLegit
-              ? 'bg-emerald-950/85 border-emerald-500/50 text-emerald-300'
+              ? 'bg-blue-950/85 border-blue-500/50 text-blue-300'
               : isWarning
               ? 'bg-amber-950/85 border-amber-500/50 text-amber-300'
               : 'bg-black/80 border-white/15 text-neutral-300'
@@ -702,7 +702,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
         >
           <span
             className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-              isScam ? 'bg-red-400' : isLegit ? 'bg-emerald-400' : isWarning ? 'bg-amber-400' : 'bg-cyan-400'
+              isScam ? 'bg-red-400' : isLegit ? 'bg-blue-400' : isWarning ? 'bg-amber-400' : 'bg-cyan-400'
             }`}
           />
           <span>
@@ -711,7 +711,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
               : isScam
               ? '💥 RED BURST: SCAM DETECTED'
               : isLegit
-              ? '🛡️ GREEN BURST: SAFE / LEGIT'
+              ? '🛡️ BLUE BURST: SAFE / LEGIT'
               : isWarning
               ? '⚠️ AMBER BURST: SUSPICIOUS'
               : shattered
@@ -741,7 +741,7 @@ export const CrystallineShield3D: React.FC<CrystallineShield3DProps> = ({
                 isScam
                   ? 'bg-red-500 hover:bg-red-400 text-white'
                   : isLegit
-                  ? 'bg-emerald-500 hover:bg-emerald-400 text-white'
+                  ? 'bg-blue-500 hover:bg-blue-400 text-white'
                   : 'bg-white text-black hover:bg-neutral-200'
               }`}
             >
