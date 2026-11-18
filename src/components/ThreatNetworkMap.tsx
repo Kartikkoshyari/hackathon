@@ -94,7 +94,7 @@ const BASE_NODES: ThreatNode[] = [
     riskLevel: 'safe',
     score: 5,
     radius: 17,
-    color: '#10b981',
+    color: '#3b82f6',
     category: 'Cryptographically Verified Safe',
     details: 'Authentic communications from validated domain authorities with legitimate signatures.',
   },
